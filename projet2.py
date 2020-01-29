@@ -47,13 +47,19 @@ def TestGen1(n,k,gen):
     " Test n fois la génération de nombres premiers pouvant être codés sur k-bits "
     l = []
     tps=0
+    bug = 0
     for i in range (0,n):
         start = time.time()
-        prime = gen(k)
+        try :
+            prime = gen(k)
+        except :
+            bug +=1
         end = time.time()
         tps += (end-start)
 
-    return ("la generation de {0} nombre(s) premier(s) a pris en moyenne {1} secondes").format(n,tps/n)
+    return ("la generation de {} nombre(s) premier(s) a pris en moyenne {} secondes, il y a eu {} bugs").format(n-bug,tps/n,bug)
+
+
 
 def List_premiers(n):
     i=0
