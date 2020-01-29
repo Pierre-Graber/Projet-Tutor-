@@ -19,7 +19,7 @@ TestGen1 : prend en parametre 2 entiers n et k et un générateur:
                       - naiveGen, random_search, gordon pour l'instant 
                       
                       
-exemple : sage : load("projet2.py")
+exemple : 
           sage : TestGen1(5,1024,naiveGen)
            'la generation de 5 nombre(s) premier(s) a pris en moyenne 0.0928555965424 secondes'
            
