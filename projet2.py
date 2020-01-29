@@ -1,3 +1,5 @@
+	
+# -*- coding: utf8 -*-
 import time
 
 def MillerRabin(n,t):
@@ -51,7 +53,7 @@ def TestGen1(n,k,gen):
         end = time.time()
         tps += (end-start)
 
-    return ("la génération de {0} nombre(s) premier(s) à pris en moyenne {} seconde").format(n,tps/n)
+    return ("la generation de {0} nombre(s) premier(s) a pris en moyenne {1} secondes").format(n,tps/n)
 
 def List_premiers(n):
     i=0
