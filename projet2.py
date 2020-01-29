@@ -25,9 +25,9 @@ def MillerRabin(n,t):
     return True
 
 def naiveGen(n):
-    q=randint(0,2**n)
+    q=Integer(randint(0,2**n))
     while (xgcd(q,2)[0]!=1):
-        q=randint(0,2**n)
+        q=Integer(randint(0,2**n))
     while not q.is_pseudoprime():
         q=q+2
     return q
