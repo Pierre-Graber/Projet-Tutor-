@@ -1,7 +1,13 @@
 	
 # -*- coding: utf8 -*-
+	
+# -*- coding: utf8 -*-
 import time
+import matplotlib
+import matplotlib.pyplot as plt
 
+#constante B pour le nombre de divisions successives nécessaires pour l'algo random_search
+B = 2**25
 def MillerRabin(n,t):
     """ entrées : un entier impair n et un paramêtre de sécurité t supérieur ou égal à 1 """
     p=n-1
@@ -26,7 +32,7 @@ def MillerRabin(n,t):
 
 def naiveGen(n):
     q=Integer(randint(0,2**n))
-    while (xgcd(q,2)[0]!=1):
+    while (q % 2 != 1):
         q=Integer(randint(0,2**n))
     while not q.is_pseudoprime():
         q=q+2
@@ -34,7 +40,7 @@ def naiveGen(n):
 
 def random_search(k):
     a = Integer(randint(0,2**k))
-    if a.trial_division(2**(sqrt(k/10)))!= a:
+    if not TrialDivision(a) :
         return random_search(k)
     else :
         if not a.is_pseudoprime():
@@ -42,6 +48,40 @@ def random_search(k):
         else:
             return a
 
+
+def RS(k):
+    a=Integer(randint(0,2**k))
+    if TrialDivision(a):
+        if a.is_pseudoprime():
+            return a
+        else:
+            try :
+                return random_search(k)
+            except:
+                return random_search(k)
+    else:
+        try :
+            return random_search(k)
+        except:
+            return random_search(k)
+            
+
+
+def TestGen(n,k,gen):
+    " Test n fois la génération de nombres premiers pouvant être codés sur k-bits "
+    l = []
+    tps=0
+    bug = 0
+    for i in range (0,n):
+        start = time.time()
+        try :
+            prime = gen(k)
+        except :
+            bug +=1
+        end = time.time()
+        tps += (end-start)
+
+    return (tps/n)
 
 def TestGen1(n,k,gen):
     " Test n fois la génération de nombres premiers pouvant être codés sur k-bits "
@@ -59,8 +99,6 @@ def TestGen1(n,k,gen):
 
     return ("la generation de {} nombre(s) premier(s) a pris en moyenne {} secondes, il y a eu {} bugs").format(n-bug,tps/n,bug)
 
-
-
 def List_premiers(n):
     i=0
     l=[]
@@ -69,14 +107,15 @@ def List_premiers(n):
         l.append(i)
     return l
 
-LP=List_premiers(2**(32))
+LP=List_premiers(B)
 
-def TrialDivision(p,B):
+def TrialDivision(p):
     for i in LP:
-        if p%i==0:
+        if p%i==0 and p!=i:
             return False
+    return True
 
-def gordon(k):
+def gordon(k=0):
     s=random_search(300)
     t=random_search(300)
     iz = randint(0,2**200)
@@ -92,3 +131,62 @@ def gordon(k):
         pz=pz+1
     p=pz+2*jz*r*s
     return p
+
+def maurer_fast(k):
+    isPrime = False
+    if k<20:
+        while not isPrime:
+            n=Integer(randint(2,2**k))
+            isPrime = True
+            for p in List_premiers(sqrt(n)):
+                if n%p==0:
+                    isPrime =False
+    else:
+        c=0.21
+        m=20
+        B=c*(k**2)
+        r=2
+        if k>2*m:
+            while k-r*k > m :
+                s=random.uniform(0,1)
+                r=2**(s-1)
+        else :
+            r=0.5
+        q=maurer_fast(floor(r*k))
+        I=floor((2**(k-1)/(2*q)))
+        succes =False
+        mayBePrime = True
+        while not succes:
+            while not mayBePrime:
+                R = randint(I+1,2*I)
+                n=R*q*2+1
+                mayBePrime=True
+                for p in List_premiers(B):
+                    if n%p==0:
+                        mayBePrime=False
+        a = randint(2,n-2)
+        b = a**(n-1)
+        if b==1:
+            b=power_mod(2,2*R,n)
+            d=gcd(b-1,n)
+            if d==1 :
+                succes = True
+    return n
+
+
+a=2
+
+def random_search_courbes() :
+    x= []
+    y=[]
+    for i in range(5,20):
+        global LP
+        LP = List_premiers(2**i)
+        y.append(TestGen(10,1000,random_search))
+        x.append(i)
+        
+    plt.plot(x,y)
+    plt.xlabel("parametre B")
+    plt.ylabel("temps de génération")
+    plt.savefig("test.png")
+    plit.show()
