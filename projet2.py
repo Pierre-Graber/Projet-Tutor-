@@ -1,4 +1,5 @@
 	
+	
 # -*- coding: utf8 -*-
 	
 # -*- coding: utf8 -*-
@@ -7,7 +8,20 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 #constante B pour le nombre de divisions successives nécessaires pour l'algo random_search
-B = 2**25
+B = 2**20
+def List_premiers(n):
+    i=0
+    l=[]
+    while i <= sqrt(n):
+        i = next_prime(i)
+        l.append(i)
+    return l
+
+LP=List_premiers(B)
+
+
+
+
 def MillerRabin(n,t):
     """ entrées : un entier impair n et un paramêtre de sécurité t supérieur ou égal à 1 """
     p=n-1
@@ -99,15 +113,7 @@ def TestGen1(n,k,gen):
 
     return ("la generation de {} nombre(s) premier(s) a pris en moyenne {} secondes, il y a eu {} bugs").format(n-bug,tps/n,bug)
 
-def List_premiers(n):
-    i=0
-    l=[]
-    while i <= sqrt(n):
-        i = next_prime(i)
-        l.append(i)
-    return l
 
-LP=List_premiers(B)
 
 def TrialDivision(p):
     for i in LP:
@@ -176,17 +182,16 @@ def maurer_fast(k):
 
 a=2
 
-def random_search_courbes() :
+def gen_courbes(gen) :
     x= []
     y=[]
-    for i in range(5,20):
+    for i in range(5,35):
         global LP
         LP = List_premiers(2**i)
-        y.append(TestGen(10,1000,random_search))
+        y.append(TestGen(800,1000,gen))
         x.append(i)
-        
+
     plt.plot(x,y)
-    plt.xlabel("parametre B")
-    plt.ylabel("temps de génération")
-    plt.savefig("test.png")
-    plit.show()
+    plt.xlabel("Nombre de divisions successives avant de passer à Miller-Rabin")
+    plt.ylabel("Temps de génération")
+    plt.show()
