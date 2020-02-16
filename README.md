@@ -6,8 +6,7 @@ naiveGen : prend en parametre un entier k et retourne un nombre premier pouvant 
            marche bien pour l'instant.
 
 random_search : prend en parametre un entier k et retourne un nombre premier pouvant être codé sur k-bits.
---> à améliorer : la fonction ne marche pas tout le temps, elle retourne une "RunTimeError" : maximum recursion.
-                  --> essayer de "catch" l'erreur ou l'exception 
+
 
 
 gordon(): prend un paramêtre qui n'influe pas sur le nombre premier retourné. (Par soucis d'uniformité pour ensuite faire un 
