@@ -4,12 +4,12 @@
 \usepackage{amsfonts}
 
 \title{Projet Tutoré : Licence Maths-Info
-\section*{Génération de grands nombres premiers aléatoires}
+\section*{Génération aléatoire de grands nombres premiers }
 \date{ Année 2019-2020}
 }
 
 
-\author{Pierre GRABER, Elias DEBEYSSAC, Toky RANDRIAMALALA }
+\author{Pierre GRABER, Elias DEBEYSSAC, Toky RANDRIAMALALA}
 
 
 \begin{document}
@@ -17,16 +17,36 @@
 \maketitle
 
 \section*{Introduction}
-Les nombres premiers sont des nombres mystérieux que les mathématiciens étudient depuis des siècles tant pour leurs propriétés algébriques que pour le caractère semblant aléatoire de leur apparition dans l'ensemble ordonné des entiers naturels, $\mathbb{N}$. En effet les nombres premiers sont largement utilisés en arithmétique et en cryptologie, car certaines de leurs propriétés permettent de garantir la sécurité de systèmes cryptographiques exploitant des problèmes mathématiquement très difficiles à résoudre, qui nécessiteraient des années de calcul par les ordinateurs les plus puissants utilisés de nos jours. \newline 
-La sécurité de ces systèmes de cryptage repose par exemple sur la difficulté de factoriser en nombres premiers de très grands nombres. De nos jours les ordinateurs, téléphones, cartes à puces utilisent une quantité industrielle de nombres premiers afin d'assurer des méthodes de cryptage fiables. La génération de grand nombres premiers est donc indispensable pour la sécurité des systèmes informatiques. Ce projet tutoré a pour but d'implémenter et d'expérimenter des algorithmes de génération de grands nombres premiers efficaces, et utilisables à des fins cryptographiques. Dans un premier temps les algorithmes seront implémentés dans un langage proche de celui de Python, grâce au logiciel de calculs mathématiques SageMath, tous les algorithmes seront tirés du livre "Handbook of Applied cryptography".
+Les nombres premiers sont des nombres mystérieux que les mathématiciens étudient depuis des siècles tant pour leurs propriétés algébriques intéressantes que pour le caractère  aléatoire de leur répartition dans l'ensemble ordonné des entiers naturels $\mathbb{N}$. En effet de nos jours les nombres premiers sont largement utilisés  en cryptographie, car  leurs propriétés permettent de garantir la sécurité de systèmes cryptographiques exploitant des problèmes mathématiquement difficiles à résoudre algorithmiquement, qui nécessiteraient des années de calcul par les ordinateurs actuels. \newline 
+La sécurité de ces systèmes de chiffrement repose par exemple sur la difficulté de retrouver la factorisation de très grands nombres en produit de "grands" facteurs premiers. Les ordinateurs, téléphones, cartes à puces utilisent une quantité industrielle de nombres premiers afin d'assurer la fiabilité de leurs méthodes de chiffrement. La génération de grand nombres premiers est donc indispensable pour la sécurité des systèmes informatiques. Ce projet tutoré a pour but d'implémenter et d'expérimenter des algorithmes efficaces de génération de grands nombres premiers, et utilisables à des fins cryptographiques. Dans un premier temps les algorithmes seront implémentés dans un langage proche de celui de Python, grâce au logiciel de calculs mathématiques SageMath, tous les algorithmes seront tirés du livre "Handbook of Applied Cryptography".
 
 \section*{Plan}
+{\Large 1) {Les tests de primalité}}\newline
+{\Large 2) {L'aléatoire de Python}}
+
 \section*{Les tests de Primalité}
-On ne connait pas de formule donnant la totalité des nombres premiers ou permettant de calculer le "n-ième" terme de la suite des nombres premiers. C'est pourquoi les générateurs de nombres premiers aléatoires utilisent des processus de choix de nombres aléatoires et testent la primalité de ces nombres. La répartition des nombres premiers nous assure qu'en effectuant de manière récursive un tel algorithme nous finirons par tomber sur un premier.
+
+
+On ne connait pas de formule donnant la totalité des nombres premiers ou permettant de calculer le "n-ième" terme de la suite des nombres premiers. Une première idée est donc d'utiliser des tests de primalité afin de déterminer si un nombre généré aléatoirement est premier ou non. La répartition des nombres premiers nous assure qu'en effectuant de manière répétitive un tel algorithme nous finirons par tomber sur un candidat probablement premier. \newline
+L'algorithme de test de primalité le plus utilisé à des fins cryptographiques de par son efficacité  est l'algorithme de Miller-Rabin (et ses variantes). Ce test  prend en entrée un entier N est nous retourne soit "non" : dans ce cas N est composé de façon certaine, soit "oui" : dans ce cas N est probablement premier. \newline
+Le test de Miller Rabin repose sur 3 théorèmes
+principaux. \newline
+\begin{itemize}
+\item Tout dabord le petit théorème de Fermat qui nous indique que pour p premier, quelque soit a premier avec p, $a^{p-1} \equiv 1 \pmod p$. \newline
+
+\item Un autre théorème nous indique que soit N un nombre impair avec $N-1 = 2^{s}t$ où t est impair. S'il existe un entier a premier avec N tel que $a^t  \not\equiv 1 \pmod N$ et $a^{(2^i)t} \not\equiv -1 \pmod N$ pour i = 0,1,...s-1 alors N est composé. Ce théorème nous donne un critère supplémentaire qui nous permet d'obtenir des témoins de non-primalité pour les nombres de Carmichael qui posent problème au petit théorème de Fermat. \newline
+
+\item Enfin le dernier théorème nous permet d'affirmer que pour $N > 9$ un nombre composé impair composé avec $N-1 = 2^{s}t$, où t impair. Alors $Card~a \in \left\{(\mathbb{Z}/N\mathbb{Z})^*, a^t \equiv 1 \pmod N~ou~ a^{2^{i}t} \equiv -1 \pmod N~pour~un~0<=i<=s-1\right\} <= \frac{phi(N)}{4}$. En itérant donc k fois l'algorithme de Miller-Rabin, on obtient donc une probabilité $<= 1/4^k$ qu'un nombre composé soit déclaré probablement premier ce qui devient négligeable avec quelques dizaines d'itérations.\newline
+\end{itemize} 
+
+Cependant il existe d'autres tests de primalité permettant de fournir une preuve de leur résultat tels que AKS, APRCL (corps cyclotomiques) ou ECPP (courbes elliptiques) contrairement à l'algorithme de Miller-Rabin. Cependant ces algorithmes sont bien plus lents et principalment utilisé à des fins théoriques.
 
 
 
-\section*{L'aléatoire de Python (donc de Sage)}
+
+
+
+\section*{L'aléatoire de Python}
  
   
 
