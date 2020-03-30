@@ -64,20 +64,13 @@ def random_search(k):
 
 
 def RS(k):
-    a=Integer(randint(0,2**k))
-    if TrialDivision(a):
-        if a.is_pseudoprime():
-            return a
-        else:
-            try :
-                return random_search(k)
-            except:
-                return random_search(k)
-    else:
-        try :
-            return random_search(k)
-        except:
-            return random_search(k)
+    b = False
+    while not b:
+        a=Integer(randint(0,2**k))
+        if TrialDivision(a):
+            if a.is_pseudoprime():
+                b=True
+    return a
             
 
 
