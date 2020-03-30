@@ -1,14 +1,18 @@
-	
-	
-# -*- coding: utf8 -*-
-	
-# -*- coding: utf8 -*-
 import time
 import matplotlib
 import matplotlib.pyplot as plt
 
+##========================================================================================================================
+## PARTIE 1 : Les tests de primalité : 
+##========================================================================================================================
+
+
 #constante B pour le nombre de divisions successives nécessaires pour l'algo random_search
 B = 2**20
+
+
+
+
 def List_premiers(n):
     i=0
     l=[]
@@ -17,7 +21,16 @@ def List_premiers(n):
         l.append(i)
     return l
 
+# Liste des nombres premiers < 2**20.
 LP=List_premiers(B)
+
+
+def TrialDivision(p):
+    "Test les divisions successives de p"
+    for i in LP:
+        if p%i==0 and p!=i:
+            return False
+    return True
 
 
 
@@ -44,6 +57,12 @@ def MillerRabin(n,t):
                 return False
     return True
 
+
+##========================================================================================================================
+## PARTIE 2 : Les algorithmes de génération aléatoire de grands nombres premiers.
+##========================================================================================================================
+
+
 def naiveGen(n):
     q=Integer(randint(0,2**n))
     while (q % 2 != 1):
@@ -62,7 +81,6 @@ def random_search(k):
         else:
             return a
 
-
 def RS(k):
     b = False
     while not b:
@@ -71,48 +89,7 @@ def RS(k):
             if a.is_pseudoprime():
                 b=True
     return a
-            
 
-
-def TestGen(n,k,gen):
-    " Test n fois la génération de nombres premiers pouvant être codés sur k-bits "
-    l = []
-    tps=0
-    bug = 0
-    for i in range (0,n):
-        start = time.time()
-        try :
-            prime = gen(k)
-        except :
-            bug +=1
-        end = time.time()
-        tps += (end-start)
-
-    return (tps/n)
-
-def TestGen1(n,k,gen):
-    " Test n fois la génération de nombres premiers pouvant être codés sur k-bits "
-    l = []
-    tps=0
-    bug = 0
-    for i in range (0,n):
-        start = time.time()
-        try :
-            prime = gen(k)
-        except :
-            bug +=1
-        end = time.time()
-        tps += (end-start)
-
-    return ("la generation de {} nombre(s) premier(s) a pris en moyenne {} secondes, il y a eu {} bugs").format(n-bug,tps/n,bug)
-
-
-
-def TrialDivision(p):
-    for i in LP:
-        if p%i==0 and p!=i:
-            return False
-    return True
 
 def gordon(k=0):
     s=random_search(300)
@@ -130,6 +107,70 @@ def gordon(k=0):
         pz=pz+1
     p=pz+2*jz*r*s
     return p
+
+
+##def RS2(k):
+##    b = False
+##    while not b:
+##        a=Integer(randint(0,2**k))
+##        if a.is_pseudoprime():
+##            b=True
+##    return a
+
+
+##========================================================================================================================
+## PARTIE 3 : Tests expérimentaux.
+##========================================================================================================================
+
+
+
+def test_if_really_Prime(gen,k):
+    b = True
+    for i in range (0,10000):
+        a=gen(k)
+        b = a.is_pseudoprime()
+    return b
+        
+
+
+def TestGen(n,k,gen):
+    " Test n fois la génération de nombres premiers pouvant être codés sur k-bits, renvoie un couple : temps moyen d'exécution , bugs "
+    l = []
+    tps=0
+    bug = 0
+    for i in range (0,n):
+        start = time.time()
+        try :
+            prime = gen(k)
+        except :
+            bug +=1
+        end = time.time()
+        tps += (end-start)
+
+    return (tps/n,bug)
+
+
+
+##def TestGen1(n,k,gen):
+##    " Test n fois la génération de nombres premiers pouvant être codés sur k-bits "
+##    l = []
+##    tps=0
+##    bug = 0
+##    for i in range (0,n):
+##        start = time.time()
+##        try :
+##            prime = gen(k)
+##        except :
+##            bug +=1
+##        end = time.time()
+##        tps += (end-start)
+##
+##    return ("la generation de {} nombre(s) premier(s) a pris en moyenne {} secondes, il y a eu {} bugs").format(n-bug,tps/n,bug)
+
+
+
+
+
 
 def maurer_fast(k):
     isPrime = False
@@ -188,3 +229,6 @@ def gen_courbes(gen) :
     plt.xlabel("Nombre de divisions successives avant de passer à Miller-Rabin")
     plt.ylabel("Temps de génération")
     plt.show()
+
+	
+	
