@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{algorithm}
 
 \title{Projet Tutoré : Licence Maths-Info
 \section*{Génération aléatoire de grands nombres premiers }
@@ -26,16 +27,23 @@ La sécurité de ces systèmes de chiffrement repose par exemple sur la difficul
 {\Large 3) {Les algorithmes de génération.}}
 
 \section*{L'aléatoire de Python}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.
+Tous nos algorithmes utilisent la libraire $random$ de python afin de générer des nombres aléatoires. Il parait donc judicieux de se pencher sur la façon dont les langages de programmation tels que python produisent ces nombres et sur le caractère vraiment aléatoire de ces nombres.
+En effet si nos algorithmes ont pour but de pouvoir être utilisés à des fins cryptographiques, il est important qu'ils soient surs, et pour cela il faut que les nombres tirés aléatoirement ne suivent aucune régularité et ne puissent pas être devinés par un attaquant quelconque.
+Si python utilisait un algorithme spécial pour calculer ces nombres alors les systèmes que nous tentons de mettre en place n'auraient aucune valeur car un attaquant aurait potentiellement des informations quant à la façon dont nous construisons nos nombres premiers aléatoires. \newline
 
-\section*{Les tests de Primalité}
+---- voir  Yarrow \newline
+---- voir  Fortuna \newline
 
-\subsection*{Les divisions successives}
+----Python $rand$ == Pseudo-aléatoire
+
+\section{Les tests de Primalité}
+
+\subsection{Les divisions successives}
 Lors de la génération d'un nombre aléatoire $n$, afin de savoir si celui ci est un nombre premier il parait raisonnable d'essayer de trouver des candidats pour sa factorisation par divisions successives avant d'effectuer un "réel" test de primalité. En effet comme tout nombre peut se décomposer en facteurs de nombres premiers, il suffit d'effectuer les divisions euclidiennes de ce $n$ par une liste de premiers inférieurs à sa racine carrée afin de savoir si celui est composé ou non. Si après avoir testé tous les nombres premiers  $ p \leq \sqrt{n}$, on ne trouve pas de $p$ tel que : $$n=0\pmod{p}$$ alors on peut conclure que n est premier. Cependant sur des nombres à plusieurs centaines de chiffres, codés par exemples sur 1024 bits, cet algorithme ne peut s'avérer efficace car il demanderait environ $ 2^{512} $ divisions ce qui est évidemment beaucoup trop couteux en temps pour être efficace. 
 Pour tester si un nombre codé sur 1024 bits (environ 300 chiffres décimaux) est premier on peut néanmoins utiliser ces divisions successives jusqu'à un certains rang que l'on appellera $B$ déterminé de manière expérimentale, avant de passer à un test de primalité comme celui expliquer dans le paragraphe suivant. 
 Le premier objectif de ce projet tutoré a donc été de fixer expérimentalement ce rang $B$ afin de savoir combien de divisions successives il est intéressant d'effectuer avant d'effectuer le test de Miller-Rabin.
 
-\subsection*{Le Test de Miller-Rabin}
+\subsection{Le Test de Miller-Rabin}
 
 
 On ne connait pas de formule donnant la totalité des nombres premiers ou permettant de calculer le "n-ième" terme de la suite des nombres premiers. Une première idée est donc d'utiliser des tests de primalité afin de déterminer si un nombre généré aléatoirement est premier ou non. La répartition des nombres premiers nous assure qu'en effectuant de manière répétitive un tel algorithme nous finirons par tomber sur un candidat probablement premier. \newline
@@ -52,10 +60,21 @@ principaux. \newline
 
 Cependant il existe d'autres tests de primalité permettant de fournir une preuve de leur résultat tels que AKS, APRCL (corps cyclotomiques) ou ECPP (courbes elliptiques) contrairement à l'algorithme de Miller-Rabin. Cependant ces algorithmes sont bien plus lents et principalment utilisé à des fins théoriques. 
 
+\section{Algorithmes de Génération de grands nombres premiers}
+
+\subsection*{Premiers algorithmes}
+
+Le premier algorithme de génération dit "naif" est simple, il consiste en deux étapes :
+    - Tirer un nombre $n$ aléatoirement jusqu'à tomber sur un impair
+    - Tester si cet impair est premier ou non
+        Si ce nombre "n" est composé on incrémente de 2 jusqu'à tomber sur un premier.
+    
+
+\begin{algorithm}
 
 
 
-
+\end{algorithm}
 
 
 
