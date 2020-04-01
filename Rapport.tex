@@ -1,9 +1,14 @@
-\documentclass{article}
+\documentclass[a4paper,11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage[francais]{babel}
+\usepackage{siunitx}
+\usepackage{algpseudocode}
+\usepackage[options ]{algorithm2e}
+\usepackage{graphicx}
 
 \title{Projet Tutoré : Licence Maths-Info
 \section*{Génération aléatoire de grands nombres premiers }
@@ -90,8 +95,48 @@ Le premier algorithme de génération dit "naif" est simple, il consiste en deux
         Si ce nombre "n" est composé on incrémente de 2 jusqu'à tomber sur un premier.
     
 \subsection{Algorithme de recherche aléatoire }
+On sait qu'il existe un nombre infini de nombres premiers (Euclide l'a démontré),  et même si leur répartition est très irréguliere et qu'ils se rarifient dès qu'ils grandissent, on sait que leur répartition vérifie plus ou moins la distribution suivante :
+la proportion de premiers $p$ $\leq$ $x$ est approximativement égale à $1/ln(x)$.
+
+On peut donc penser qu'en tirant un nombre au hasard un certains nombre de fois dans un ensemble donné on tombera forcément à un moment ou un autre sur un nombre premier.
+De plus comme dit dans la partie concernant l'aléatoire, le tirage aléatoire d'un nombre par python est très rapide, il prend environ  \num{4e-6} seconde. En répétant donc cette opération un certain nombre de fois on arrive a trouver des nombres premiers grands en un temps raisonnable, dépendamment du test de primalité utilisé. 
+
+L'algorithme de recherche aléatoire se décompose donc de la manière suivante : 
+
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwResult{Un entier $n$ de 300 chiffres premier}
+ initialization\;
+ \While{While condition}{
+  instructions\;
+  \eIf{condition}{
+   instructions1\;
+   instructions2\;
+   }{
+   instructions3\;
+  }
+ }
+ \caption{Recherche aléatoire}
+\end{algorithm}
+
+soit le code suivant en SageMath (python) :
+\newline
+\includegraphics[scale=0.75]{RS.png}
 
 \subsection{Génération de nombres premiers forts: Algorithme de Gordon}
+
+Un deuxieme algrithme proposé par le livre "Handbook of Appplied cryptography" permet de générer des nombres premiers mais cette fois ci avec des caractéristiques supplémentaires, qui permettent donc d'être utilisés de manière plus sécurisées notamment pur des systèmes de type RSA.
+Ces nombres premiers sont appelés des $strong prime$ en anglais, ils remplissent les conditions suivantes : \newline
+
+$p$ est un "strong prime" si il existe des entiers $r$,$s$,$t$ tels que :
+\begin{itemize}
+\item $p-1$ a un "grand" facteur premier noté $r$;
+\item $p+1$ a un "grand" facteur premier noté $s$;
+\item $r-1$ a un "grand" facteur premier noté $t$
+\end{itemize}
+
+La génération de tels nombres premiers est donc 
 
 \subsection{Méthode NIST}
 
