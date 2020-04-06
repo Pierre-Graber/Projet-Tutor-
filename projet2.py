@@ -1,6 +1,7 @@
 import time
 import matplotlib
 import matplotlib.pyplot as plt
+import hashlib
 
 ##========================================================================================================================
 ## PARTIE 1 : Les tests de primalité : 
@@ -12,7 +13,12 @@ B = 2**20
 
 
 
-
+def H(s):
+    s=str(s)
+    sha2 = hashlib.sha256
+    a=sha2(s.encode('utf-8'))
+    return ZZ(a.hexdigest(),16)
+    
 def List_premiers(n):
     i=0
     l=[]
@@ -23,6 +29,14 @@ def List_premiers(n):
 
 # Liste des nombres premiers < 2**20.
 LP=List_premiers(B)
+
+
+def LongDivision(n,m):
+    i=1
+    while i*m <= n:
+        i=i+1
+    return (i-1,n-(i-1)*m)
+
 
 
 def TrialDivision(p):
@@ -72,6 +86,7 @@ def naiveGen(n):
     return q
 
 def random_search(k):
+    " Algo random_search récursif "
     a = Integer(randint(0,2**k))
     if not TrialDivision(a) :
         return random_search(k)
@@ -82,11 +97,31 @@ def random_search(k):
             return a
 
 def RS(k):
+    " Algo random_search avec boucle while =/= récursif "
     b = False
     while not b:
         a=Integer(randint(0,2**k))
         if TrialDivision(a):
             if a.is_pseudoprime():
+                b=True
+    return a
+
+def RS2(k):
+    " Algo random_search avec boucle while =/= récursif sans Divisions successives"
+    b = False
+    while not b:
+        a=Integer(randint(0,2**k))
+        if a.is_pseudoprime():
+            b=True
+    return a
+
+def RS3(k):
+    " RS avec notre test de miller-rabin"
+    b = False
+    while not b:
+        a=Integer(randint(0,2**k))
+        if TrialDivision(a):
+            if MillerRabin(a,3):
                 b=True
     return a
 
@@ -109,11 +144,16 @@ def gordon(k=0):
     return p
 
 
+
+
+    
+    
+    
+    
 def nist(l):
     q=Integer(8)
     L=512+64*l
     n,b = LongDivision(L-1,160)
-    print("test")
     my_bool = False
     while not my_bool :
         while not q.is_pseudoprime():
@@ -146,6 +186,47 @@ def nist(l):
                     return (q,p)
             i += 1
             j += 1
+
+def maurer(k):
+    b1 = True
+    b2 = True
+    if k <= 20 :
+        while b1:
+            n = Integer(randint(0,2**k))
+            if TrialDivision(n):
+                b1 = False
+    else :
+        while b2:
+            c=0.1
+            m=20
+            B=c*(k**2)
+            r=0
+            if k>(2*m):
+                while (k-r*k) > m :
+                    s=random()
+                    r=2**(s-1)
+            else :
+                r=0.5
+            rk=floor(r*k)+1
+
+            q = maurer(rk)
+            I = floor(2**(k-1) / (2*q))
+            succes = 0
+            while (succes==0):
+                R = randint(I+1, 2*I)
+                n=2*R*q+1
+                if TrialDivision(n):
+                    a = randint(2,n-1)
+                    b = power_mod(a,n-1,n)
+                    if b==1 :
+                        b = power_mod(a,2*R,n)
+                        d=gcd(b-1,n)
+                        if d==1:
+                            succes = 1
+                            b2=False
+                            
+    return n
+
 
 
 ##def RS2(k):
@@ -186,7 +267,9 @@ def TestGen(n,k,gen):
         end = time.time()
         tps += (end-start)
 
-    return (tps/n,bug)
+    if bug==0:
+           return (tps/n)
+        
 
 
 
@@ -211,63 +294,28 @@ def TestGen(n,k,gen):
 
 
 
-def maurer_fast(k):
-    isPrime = False
-    if k<20:
-        while not isPrime:
-            n=Integer(randint(2,2**k))
-            isPrime = True
-            for p in List_premiers(sqrt(n)):
-                if n%p==0:
-                    isPrime =False
-    else:
-        c=0.21
-        m=20
-        B=c*(k**2)
-        r=2
-        if k>2*m:
-            while k-r*k > m :
-                s=random.uniform(0,1)
-                r=2**(s-1)
-        else :
-            r=0.5
-        q=maurer_fast(floor(r*k))
-        I=floor((2**(k-1)/(2*q)))
-        succes =False
-        mayBePrime = True
-        while not succes:
-            while not mayBePrime:
-                R = randint(I+1,2*I)
-                n=R*q*2+1
-                mayBePrime=True
-                for p in List_premiers(B):
-                    if n%p==0:
-                        mayBePrime=False
-        a = randint(2,n-2)
-        b = a**(n-1)
-        if b==1:
-            b=power_mod(2,2*R,n)
-            d=gcd(b-1,n)
-            if d==1 :
-                succes = True
-    return n
-
 
 a=2
+
+
+
+
+def bin_to_dec(L):
+    ret = 0
+    for i in range (0,len(L)):
+        if L[i] == 1 :
+            ret+= 2**i
+    return ret
 
 def gen_courbes(gen) :
     x= []
     y=[]
-    for i in range(5,35):
+    for i in range(18,28):
         global LP
         LP = List_premiers(2**i)
-        y.append(TestGen(800,1000,gen))
-        x.append(i)
+        y.append(TestGen(100,1000,gen))
+        x.append(2**i)
 
     plt.plot(x,y)
-    plt.xlabel("Nombre de divisions successives avant de passer à Miller-Rabin")
-    plt.ylabel("Temps de génération")
-    plt.show()
-
 	
 	
