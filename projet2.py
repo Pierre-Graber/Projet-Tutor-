@@ -316,6 +316,6 @@ def gen_courbes(gen) :
         y.append(TestGen(100,1000,gen))
         x.append(2**i)
 
-    plt.plot(x,y)
+    return (x,y)
 	
 	
