@@ -1,26 +1,11 @@
 # Projet-Tutoré-
 
-fonctions du fichier : 
+L'ensemble du projet est découpé en plusieurs fichiers dans le dossier "Sage".
 
-naiveGen : prend en parametre un entier k et retourne un nombre premier pouvant être codé sur k-bits.
-           marche bien pour l'instant.
+Fichiers "tools.py" : 
+           - Ensemble des fonctions nécessaires pour utiliser les algorithmes, en particulier pour maurer qui a besoin de fonction de                    hachage mais aussi de conversion binaire vers décimale.
+Fichiers Générateur :
 
-random_search : prend en parametre un entier k et retourne un nombre premier pouvant être codé sur k-bits.
-
-
-
-gordon(): prend un paramêtre qui n'influe pas sur le nombre premier retourné. (Par soucis d'uniformité pour ensuite faire un 
-testeur générique pour tous les tests).
-
-TestGen1 : prend en parametre 2 entiers n et k et un générateur:
-                      - n le nombre d'itérations du test
-                      - k le nombre de bits 
-                      - naiveGen, random_search, gordon pour l'instant 
-                      
-                      
-exemple : 
-          sage : TestGen1(5,1024,naiveGen)
-           'la generation de 5 nombre(s) premier(s) a pris en moyenne 0.0928555965424 secondes'
            
 
 
