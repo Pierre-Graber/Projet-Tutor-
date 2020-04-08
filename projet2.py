@@ -190,6 +190,7 @@ def nist(l):
 def maurer(k):
     b1 = True
     b2 = True
+    r=0
     if k <= 20 :
         while b1:
             n = Integer(randint(0,2**k))
@@ -200,11 +201,13 @@ def maurer(k):
             c=0.1
             m=20
             B=c*(k**2)
-            r=0
+            
             if k>(2*m):
-                while (k-r*k) > m :
+                while True:
                     s=random()
                     r=2**(s-1)
+                    if (k-r*k)>m:
+                        break
             else :
                 r=0.5
             rk=floor(r*k)+1
@@ -214,6 +217,7 @@ def maurer(k):
             succes = 0
             while (succes==0):
                 R = randint(I+1, 2*I)
+                
                 n=2*R*q+1
                 if TrialDivision(n):
                     a = randint(2,n-1)
