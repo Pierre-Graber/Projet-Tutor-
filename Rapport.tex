@@ -24,7 +24,7 @@
 \maketitle
 
 \section*{Introduction}
-Les nombres premiers sont des nombres mystérieux que les mathématiciens étudient depuis des siècles tant pour leurs propriétés algébriques intéressantes que pour le caractère  aléatoire de leur répartition dans l'ensemble ordonné des entiers naturels $\mathbb{N}$. En effet de nos jours les nombres premiers sont largement utilisés  en cryptographie, car  leurs propriétés permettent de garantir la sécurité de systèmes cryptographiques exploitant des problèmes mathématiquement difficiles à résoudre algorithmiquement, qui nécessiteraient des années de calcul par les ordinateurs actuels. \newline 
+Les nombres premiers sont des nombres mystérieux que les mathématiciens étudient depuis des siècles tant pour leurs propriétés algébriques que pour le caractère  aléatoire de leur répartition dans l'ensemble ordonné des entiers naturels $\mathbb{N}$. En effet de nos jours les nombres premiers sont largement utilisés  en cryptographie, car  leurs propriétés permettent de garantir la sécurité de systèmes cryptographiques exploitant des problèmes mathématiquement difficiles à résoudre algorithmiquement, qui nécessiteraient des années de calcul par les ordinateurs actuels. \newline 
 La sécurité de ces systèmes de chiffrement repose par exemple sur la difficulté de retrouver la factorisation de très grands nombres en produit de "grands" facteurs premiers. Les ordinateurs, téléphones, cartes à puces utilisent une quantité industrielle de nombres premiers afin d'assurer la fiabilité de leurs méthodes de chiffrement. La génération de grand nombres premiers est donc indispensable pour la sécurité des systèmes informatiques. Ce projet tutoré a pour but d'implémenter et d'expérimenter des algorithmes efficaces de génération de grands nombres premiers, et utilisables à des fins cryptographiques. Dans un premier temps les algorithmes seront implémentés dans un langage proche de celui de Python, grâce au logiciel de calculs mathématiques SageMath, tous les algorithmes seront tirés du livre "Handbook of Applied Cryptography".
 
 
@@ -85,15 +85,19 @@ Cependant il existe d'autres tests de primalité permettant de fournir une preuv
 
 Dans le cadre ce projet tutoré nous utiliserons donc le test de primalité de Miller-Rabin pour nos algorithmes. Nous comparerons l'efficacité de nos résultats (en temps) avec le test utilisé par Sage lors de l'appel à la fonction "is pseudoprime", i.e le test de Baillie-PSW, qui est une combinaison de test de Miller-rabin et de Lucas.
 
+
 \section{Algorithmes de Génération de grands nombres premiers}
 
 \subsection{Génération "naïve"}
+
+---> pas aléatoire 
 
 Le premier algorithme de génération dit "naif" est simple, il consiste en deux étapes :
     - Tirer un nombre $n$ aléatoirement jusqu'à tomber sur un impair
     - Tester si cet impair est premier ou non
         Si ce nombre "n" est composé on incrémente de 2 jusqu'à tomber sur un premier.
     
+Cette méthode présente un inconvénient majeur, en effet cette génération ne peut pas être considérée comme aléatoire. 
 \subsection{Algorithme de recherche aléatoire }
 On sait qu'il existe un nombre infini de nombres premiers (Euclide l'a démontré),  et même si leur répartition est très irréguliere et qu'ils se rarifient dès qu'ils grandissent, on sait que leur répartition vérifie plus ou moins la distribution suivante :
 la proportion de premiers $p$ $\leq$ $x$ est approximativement égale à $1/ln(x)$.
@@ -104,21 +108,7 @@ De plus comme dit dans la partie concernant l'aléatoire, le tirage aléatoire d
 L'algorithme de recherche aléatoire se décompose donc de la manière suivante : 
 
 
-\begin{algorithm}[H]
-\SetAlgoLined
-\KwResult{Un entier $n$ de 300 chiffres premier}
- initialization\;
- \While{While condition}{
-  instructions\;
-  \eIf{condition}{
-   instructions1\;
-   instructions2\;
-   }{
-   instructions3\;
-  }
- }
- \caption{Recherche aléatoire}
-\end{algorithm}
+Algo en pseudo-code ?
 
 soit le code suivant en SageMath (python) :
 \newline
@@ -135,15 +125,47 @@ $p$ est un "strong prime" si il existe des entiers $r$,$s$,$t$ tels que :
 \item $p+1$ a un "grand" facteur premier noté $s$;
 \item $r-1$ a un "grand" facteur premier noté $t$
 \end{itemize}
+\newline
+\medbreak
 
-La génération de tels nombres premiers est donc 
+    La génération de tels nombres premiers nécessite donc un peu plus de temps que l'algorithme précedent mais elle fournit des nombres premiers qui sont "protégés" des algorithmes de factorisation de $p-1$ et $p+1$.
 
-\subsection{Méthode NIST}
+\subsection{Méthode proposée par le NIST :  génération de premiers pour DSA}
+Le NIST est l'Institut national des normes et de la technologie américain. Cet institut a proposé un algorithme en 1991 basé sur l'exponentiation modulaire et le problème du logarithme discret permettant de fournir une signature numérique, outil essentiel pour garantir l'intégrité d'un document  ainsi que l'authentification de son auteur.\newline
+Le mécanisme proposé par le NIST se décompose en 3 étapes : \newline
+\begin{itemize}
+\item Génération de clés. 
+\item Signature du document.
+\item Vérification du document.
+\end{itemize}
+\medbreak
+Dans la cadre de notre projet nous nous intéresserons à la premiere étape de ce processus c'est à dire la génération des clés. 
+La génération des clés doit donner un couple de premiers $(q,p)$ qui doivent satisfaire les conditions suivantes:
+
+
+Soient $L$ et $N$ des longueurs, avec $N$ divisible par 64.
+\medbreak
+\begin{itemize}
+\item Le premier $p$ doit être longueur $L$.  
+\item Le premier $q$ doit être longueur $N$
+\item $(p-1)$ doit être divisible par q.
+\end{itemize}
+
 
 \subsection{Premiers prouvables : Algorithme de Maurer}
 
 \section{Résultats expérimentaux}
+Dans cette partie nous expliciterons les résultats obtenus avec nos algorithmes. Nous comparerons l'efficacité en temps obtenue en utilisant les tests de primalité fournis par Sage et nos tests pour chacun des générateurs cités précedemment.
 
+\subsection{Détermination du nombre de Division successives}
+La première étape de nos tests expérimentaux a été la détermination du paramètre appelé "B" dans le "Handbook of applied cryptography". Ce paramètre définit le nombre de divisions successives qu'il est judicieux d'effectuer avant de passer à un test de primalité du type Miller-Rabin. Cette étape permet d'éliminer un certain nombre de candidats de manière plus rapide qu'un "réel" test de primalité et donc de gagner du temps sur la génération d'un premier. 
+\newline
+Afin de définir ce paramètre nous avons pré-calculé une liste de premiers inférieurs ou égaux à $2^{32}$. Ensuite nous utilisons notre générateur afin de connaitre le temps moyen pour générer 1000 chiffres premiers avec l'algorithme de notre choix. Le parametre B est alors la valeur jusqu'à laquelle nous allons effectuer les divisions euclidiennes.
+Plus précisemment nos algorithmes de divisions successives effectue les divisions jusqu'à la racine de B. 
+
+
+
+\subsection{Distribution aléatoire}
 \section*{Sources}
 
 
