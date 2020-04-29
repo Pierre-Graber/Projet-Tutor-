@@ -154,6 +154,9 @@ Soient $L$ et $N$ des longueurs, avec $N$ divisible par 64.
 
 \subsection{Premiers prouvables : Algorithme de Maurer}
 
+Le prochain algorithme est spécial dans le sens ou il est le seul de notre liste d'algorithmes capable de fournir des nombres premiers surs, prouvables. Son temps d'execution est légérement plus élevé que le temps d'exécution d'un algorithme générant des pseudo-premiers, mais il est néanmoins plutôt efficace pour les tailles dont nous avons besoin. Cet algorithme est un raffinement du théorème de Pocklingon.
+
+
 \section{Résultats expérimentaux}
 Dans cette partie nous expliciterons les résultats obtenus avec nos algorithmes. Nous comparerons l'efficacité en temps obtenue en utilisant les tests de primalité fournis par Sage et nos tests pour chacun des générateurs cités précedemment.
 
@@ -162,6 +165,19 @@ La première étape de nos tests expérimentaux a été la détermination du par
 \newline
 Afin de définir ce paramètre nous avons pré-calculé une liste de premiers inférieurs ou égaux à $2^{32}$. Ensuite nous utilisons notre générateur afin de connaitre le temps moyen pour générer 1000 chiffres premiers avec l'algorithme de notre choix. Le parametre B est alors la valeur jusqu'à laquelle nous allons effectuer les divisions euclidiennes.
 Plus précisemment nos algorithmes de divisions successives effectue les divisions jusqu'à la racine de B. 
+
+
+\subsection{Factorisation }
+Danc cette partie nous comparons les temps de factorisation de modules RSA (de tailles raisonnables) générés avec deux de nos algorithmes : random-search et gordon. Cette partie tente donc de montrer l'utilité de l'algorithme de gordon qui permet de générer des premiers "forts", présentant donc des avantages quant à la sécurité du module.
+Sage fournit une fonction permettant de factoriser un entier si sa taille est raisonnable (exemple : la fonction prend quelques secondes (1/10s) pour des entiers codés sur 70/80bits). 
+\par Nous avons donc ecrit une fonction permettant de calculer le temps de factorisation d'un module RSA, donc d'un entier $n$ tel que : \
+\ $n = p * q$ 
+\newline avec $p$ et $q$ deux premiers générés soit par l'algorithme random-search, soit par celui de gordon.
+
+Les temps de factorisation pour des modules de petites tailles ($ < 70 bits$) sont sensiblement identiques.
+
+\hfill\hbox to 0pt{\hss\includegraphics{factr.png}\hss}\hfill\null
+
 
 
 
