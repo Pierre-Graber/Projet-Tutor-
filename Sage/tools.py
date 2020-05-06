@@ -1,3 +1,4 @@
+# coding: utf-8
 from sage.all import*
 import hashlib
 
@@ -9,12 +10,12 @@ import hashlib
 
 
 #constante B pour le nombre de divisions successives nécessaires pour l'algo random_search
-B = 2**20
+B = 2**10
 
 def List_premiers(n):
     i=0
     l=[]
-    while i <= sqrt(n):
+    while i <= (n):
         i = next_prime(i)
         l.append(i)
     return l
@@ -57,17 +58,33 @@ def H(s):
     return ZZ(a.hexdigest(),16)
 
 
+#======================================================================================
+def ecmExpectedTime(gen,k):
+	module = gen(k) * gen(k)
+	return ecm.time(module,30)
+
+def ecmTime(gen,k):
+	module = gen(k) * gen(k)
+	return tps(ecm.factor,module)
+
+#======================================================================================
+
+def tps(f,k):
+	start = time.time()
+	f(k)
+	end = time.time()
+	return end-start
+
+
+
 #=================================================================================================================
-# Attaque de Pollard
-#===============================================================================
-def PollardAttack(N) :
-    B = 2
-    a = 2
-    while True:
-        a = power_mod(a, B, N)
-        p = xgcd(a-1, N)
-        if p[0] != 1 :
-            print ("p = "+str(p[0]))
-            print ("q = "+str(N/p[0]))
-            break
-        B += 1
+# liste utile :
+
+ListeBits = [8,12,16,32,56,64,128,160,256,512,1024]
+
+
+
+
+
+
+

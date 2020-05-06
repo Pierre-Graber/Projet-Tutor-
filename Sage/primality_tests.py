@@ -1,3 +1,4 @@
+# coding: utf-8
 import time
 import matplotlib
 import matplotlib.pyplot as plt
@@ -5,6 +6,7 @@ import hashlib
 from math import sqrt
 from tools import*
 from sage.all import*
+from SAVED_LIST import*
 
 ##========================================================================================================================
 ## PARTIE 1 : Les tests de primalité : 
@@ -13,13 +15,31 @@ from sage.all import*
 
 
 
-def TrialDivision(p):
+
+
+def TrialDivision(p,n=2**60):
     "Test les divisions successives de p"
-    for i in LP:
+    j=0
+    for i in ListeOK :
+        if j>n :
+            return True
         if p%i==0 and p!=i:
             return False
+        j=i
     return True
 
+
+##def TrialDivision(p,n):
+##    "Test les divisions successives de p"
+##    j=0
+##    for i in ListeOK :
+##        if j>n :
+##            return True
+##	if (p%i==0) and (p!=i) :
+##	    return False
+##	j=i
+##    return True
+        	
 
 
 
