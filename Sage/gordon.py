@@ -1,7 +1,7 @@
 from primality_tests import*
 from sage.all import*
 from random_search import*
-from pollard import*
+from factor_tools import*
 
 def gordon(test=is_pseudoprime):
     s=RS(300)
@@ -38,19 +38,11 @@ def gT(n,test=is_pseudoprime):
     p=pz+2*jz*r*s
     return p
 
-def ttt():
-    r=RS(300)
-    return r
 
 def testComparaisonGordon(RS,G):
     return (pollard(Integer(RS[0]),130000),pollard(Integer(G[0]),130000))
     
 
-def RS_GG(k):
-    p,q = (RS(k),RS(k+6))
-    pp,qq = (gT(k),gT(k+6))
-    
-    return (p*q,p,q),(pp*qq,pp,qq)
 
 
 
