@@ -14,10 +14,10 @@ def gordon(test=is_pseudoprime):
 
     pz = 2*power_mod(s,r-2,r)*s -1
     jz = randint(0,2**200)
-
-    while not test(pz+2*jz*r*s):
-        pz=pz+1
-    p=pz+2*jz*r*s
+    j = jz
+    while not test(pz+2*j*r*s):
+        j=j+1
+    p=pz+2*j*r*s
     return p
 
 
@@ -32,10 +32,10 @@ def gT(n,test=is_pseudoprime):
 
     pz = 2*power_mod(s,r-2,r)*s -1
     jz = randint(0,2**(n//5))
-
-    while not test(pz+2*jz*r*s):
-        pz=pz+1
-    p=pz+2*jz*r*s
+    j=jz
+    while not test(pz+2*j*r*s):
+        j=j+1
+    p=pz+2*j*r*s
     return p
 
 def ttt():

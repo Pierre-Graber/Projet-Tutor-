@@ -79,8 +79,8 @@ def factor_CompareCourbes(gen1,gen2,k,n,fact_Alg):
     x2=[]
     y2=[]
     for i in range (k,k+n):
-        x1.append(factor_AverageTime(gen1,i,20,fact_Alg))
-        x2.append(factor_AverageTime(gen2,i,20,fact_Alg))
+        x1.append(factor_AverageTime(gen1,i,30,fact_Alg))
+        x2.append(factor_AverageTime(gen2,i,30,fact_Alg))
         y1.append(i)
         y2.append(i)
     return (x1,y1),(x2,y2)

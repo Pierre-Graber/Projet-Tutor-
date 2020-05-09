@@ -50,3 +50,30 @@ def gen_courbesRS() :
         x.append(i)
 
     return x,y
+
+
+
+def distribution(n,k,gen):
+     intervalle = [0, 100000]
+     mD = {}
+     for i in range (0,n):
+         p = gen(k)
+         if intervalle[0] < p < intervalle[1]:
+             if p in mD :
+                 mD[p]+=1
+             else :
+                 mD[p]=1
+     return mD
+
+
+
+
+
+
+
+
+
+
+
+
+         
