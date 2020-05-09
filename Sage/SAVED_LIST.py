@@ -1,3 +1,5 @@
+""" Liste des premiers pour TrialDivision """
+
 ListeOK = [2,
  3,
  5,
