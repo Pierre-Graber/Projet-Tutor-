@@ -50,18 +50,6 @@ def factorRunningTime(N,fact):
 def t(N,f):
     return f(N)
 
-def Compare(k):
-    a=0
-    b=0
-    for i in range (0,k):
-        A,B = RS_GG(100)
-        while (len(str(A[0])) != len(str(B[0]))):
-            A,B = RS_GG(100)
-        a+= factorRunningTime(A[0])[1]
-        b+= factorRunningTime(B[0])[1]
-        print(a,b)
-    return(a/k,b/k)
-
 
     
     
