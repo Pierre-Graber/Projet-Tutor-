@@ -9,6 +9,33 @@
 \usepackage{algpseudocode}
 \usepackage[options ]{algorithm2e}
 \usepackage{graphicx}
+With
+
+\usepackage{algorithm}  
+\usepackage{algpseudocode}
+My humble contribution to the French translation (thanks @David-Carlisle):
+
+\renewcommand{\listalgorithmname}{Liste des algorithmes}
+\floatname{algorithm}{Algorithme}
+\renewcommand{\algorithmicreturn}{\textbf{retourne}}
+\renewcommand{\algorithmicprocedure}{\textbf{procédure}}
+\renewcommand{\Not}{\textbf{non}\ }
+\renewcommand{\And}{\textbf{et}\ }
+\renewcommand{\Or}{\textbf{ou}\ }
+\renewcommand{\algorithmicrequire}{\textbf{Entrée:}}
+\renewcommand{\algorithmicensure}{\textbf{Sortie:}}
+%\renewcommand{\algorithmiccomment}[1]{\{#1\}}
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{si}}
+\renewcommand{\algorithmicthen}{\textbf{alors}}
+\renewcommand{\algorithmicelse}{\textbf{sinon}}
+\renewcommand{\algorithmicfor}{\textbf{pour}}
+\renewcommand{\algorithmicforall}{\textbf{pour tout}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{tant que}}
+\newcommand{\algorithmicelsif}{\algorithmicelse\ \algorithmicif}
+\newcommand{\algorithmicendif}{\algorithmicend\ \algorithmicif}
+\newcommand{\algorithmicendfor}{\algorithmicend\ \algorithmicfor}
 
 \title{Projet Tutoré : Licence Maths-Info
 \section*{Génération aléatoire de grands nombres premiers }
@@ -98,17 +125,17 @@ Le premier algorithme de génération dit "naif" est simple, il consiste en deux
         Si ce nombre "n" est composé on incrémente de 2 jusqu'à tomber sur un premier.
     
 Cette méthode présente un inconvénient majeur, en effet cette génération ne peut pas être considérée comme aléatoire. 
+
 \subsection{Algorithme de recherche aléatoire }
 On sait qu'il existe un nombre infini de nombres premiers (Euclide l'a démontré),  et même si leur répartition est très irréguliere et qu'ils se rarifient dès qu'ils grandissent, on sait que leur répartition vérifie plus ou moins la distribution suivante :
 la proportion de premiers $p$ $\leq$ $x$ est approximativement égale à $1/ln(x)$.
+
 
 On peut donc penser qu'en tirant un nombre au hasard un certains nombre de fois dans un ensemble donné on tombera forcément à un moment ou un autre sur un nombre premier.
 De plus comme dit dans la partie concernant l'aléatoire, le tirage aléatoire d'un nombre par python est très rapide, il prend environ  \num{4e-6} seconde. En répétant donc cette opération un certain nombre de fois on arrive a trouver des nombres premiers grands en un temps raisonnable, dépendamment du test de primalité utilisé. 
 
 L'algorithme de recherche aléatoire se décompose donc de la manière suivante : 
 
-
-Algo en pseudo-code ?
 
 soit le code suivant en SageMath (python) :
 \newline
@@ -129,6 +156,33 @@ $p$ est un "strong prime" si il existe des entiers $r$,$s$,$t$ tels que :
 \medbreak
 
     La génération de tels nombres premiers nécessite donc un peu plus de temps que l'algorithme précedent mais elle fournit des nombres premiers qui sont "protégés" des algorithmes de factorisation de $p-1$ et $p+1$.
+    
+    
+
+\begin{algorithm}[H]
+\SetAlgoLined
+
+
+\algorithmicrequire{ Un entier "k".}\newline
+\algorithmicensure{ Un premier codé sur k-bits.}\newline
+
+ 1 - Générer deux premiers $s$ et $t$ de même taille.\newline
+ 2 - Choisir un entier aléatoire $i$ \newline
+ 3 - \algorithmicwhile{ $2it+1$ n'est pas premier : }\newline
+\hspace*{15mm} i=i+1\newline
+ 4 - Calculer $r = 2it+1$ \newline
+ 5 - Calculer $ p_{0}$ = $ 2 ( s^{r-2} \mod r )s - 1$ \newline
+ 6 - Tirer un entier aléatoire $j$ de même taille que $i$ \newline
+ 7 - \algorithmicwhile{ $p_{0} + 2jrs $ n'est pas premier : }\newline
+ \hspace*{15mm} $p_{0}=p_{0}+1$\newline
+ 8 - \algorithmicreturn{ $p$ = $p_{0} + 2 * j_{0}$}
+ 
+ 
+ 
+ \caption{Algorithme de Gordon pour la génération de premiers forts}
+\end{algorithm}
+
+Nous verrons dans la partie 3 de ce rapport en quoi et comment l'algorithme de gordon protège de certaines attaques de factorisation.
 
 \subsection{Méthode proposée par le NIST :  génération de premiers pour DSA}
 Le NIST est l'Institut national des normes et de la technologie américain. Cet institut a proposé un algorithme en 1991 basé sur l'exponentiation modulaire et le problème du logarithme discret permettant de fournir une signature numérique, outil essentiel pour garantir l'intégrité d'un document  ainsi que l'authentification de son auteur.\newline
@@ -155,6 +209,46 @@ Soient $L$ et $N$ des longueurs, avec $N$ divisible par 64.
 \subsection{Premiers prouvables : Algorithme de Maurer}
 
 Le prochain algorithme est spécial dans le sens ou il est le seul de notre liste d'algorithmes capable de fournir des nombres premiers surs, prouvables. Son temps d'execution est légérement plus élevé que le temps d'exécution d'un algorithme générant des pseudo-premiers, mais il est néanmoins plutôt efficace pour les tailles dont nous avons besoin. Cet algorithme est un raffinement du théorème de Pocklingon.
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\newline\newline
+Nom de l'algorithme pour l'appel récursif : \newline
+\hspace*{5mm}  $PremierProuvable(k)$ \newline
+\newline
+\algorithmicrequire{ Un entier "k".}\newline
+\algorithmicensure{ Un premier codé sur k-bits.}\newline
+
+ 1 - \emph{Si k est petit (inférieur à 20) on renvoie un nombre premier aléatoire testé grâce à la méthode des divisions successives }\newline
+ 2 - Initialiser : $c = 0.1$ et $m=20$ \newline
+ 3 - Calculer : $B = c * k^2$ \newline
+ 4 - \algorithmicwhile{ $(k - rk) > m $ :} \newline
+ \hspace*{10mm} \algorithmicif{ $k > 2m$ :}\newline
+ \hspace*{20mm} - Tirer une réel $s$ aléatoire tel que : $ s \in [0,1] $      \newline
+ \hspace*{20mm} - Calculer $r = 2^{s-1}$ \newline
+ \hspace*{10mm} \algorithmicelse : \newline
+ \hspace*{20mm} - Initialiser :  $r = 0.5$
+ 
+ 5 - Calculer : $q = PremierProuvable(k)$ \newline
+ 6 - Initialiser : I = \lfloor 2^{n-1} / 2q \rfloor/ \newline 
+ 
+ 7 - Initialiser : success = 0 \newline
+ 8 - \algorithmicwhile { success = 0}{ \newline
+\hspace*{10mm}    - Tirer un entier aléatoire $R \in [I+1,2I] $ \newline
+\hspace*{10mm}   - Calculer $n = 2Rq + 1 $ \newline
+\hspace*{10mm} - Tester la primalité de $n$ par l'algorithme de divisions successives jusqu'à $B$. \;\newline
+ \hspace*{11mm} \algorithmicif{  n n'a pas de facteurs premiers inférieurs à B :} \newline
+ \hspace*{20mm} - Tirer un entier aléatoire $a \in [2,n-2]$ \newline
+ \hspace*{20mm} - Calculer $ b = a^{n-1} mod n$ \newline
+ \hspace*{20mm} - \algorithmicif{ $b = 1$ } : \newline
+ \hspace*{30mm} - Calculer $ b = a^{2R}$ mod $n$ et $d = pgcd(b-1,n)$ \newline
+ \hspace*{30mm} - \algorithmicif{ d = 1 : \newline  \hspace*{40mm} success = 1} \newline
+ }
+ 9 - \algorithmicreturn{ $n$}
+ \newline
+ 
+ \caption{Algorithme de Maurer pour la génération de premiers prouvable}
+\end{algorithm}
 
 
 \section{Résultats expérimentaux}
