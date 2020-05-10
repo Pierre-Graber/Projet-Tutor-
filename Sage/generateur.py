@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import hashlib
 from random_search import RS
 
-def GenerationAverageTime(n,k,gen,test):
+def GenerationAverageTime(n,k,gen,test=is_pseudoprime):
     " Test n fois la génération de nombres premiers pouvant être codés sur k-bits, renvoie un couple : temps moyen d'exécution , bugs "
     l = []
     tps=0
