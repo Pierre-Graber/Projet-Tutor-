@@ -1,4 +1,5 @@
 # coding: utf-8
+from sage.all import*
 import time
 import matplotlib
 import matplotlib.pyplot as plt
