@@ -1,11 +1,12 @@
 # coding: utf-8
+from sage.all import*
 import time
 import matplotlib
 import matplotlib.pyplot as plt
 import hashlib
 from random_search import RS
 
-def TestGen(n,k,gen):
+def GenerationAverageTime(n,k,gen,test=is_pseudoprime):
     " Test n fois la génération de nombres premiers pouvant être codés sur k-bits, renvoie un couple : temps moyen d'exécution , bugs "
     l = []
     tps=0
@@ -13,7 +14,7 @@ def TestGen(n,k,gen):
     for i in range (0,n):
         start = time.time()
         try :
-            prime = gen(k)
+            prime = gen(k,test)
         except :
             bug +=1
         end = time.time()
