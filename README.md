@@ -20,6 +20,10 @@ Une fois le fichier loadALL.py chargé :
                                - sage: nist(8)
                       4) Maurer :
                                - maurer(1024)
+                               
+            Ces 4 algorithmes utilisent par défaut le test de pseud-primalité  de Sage, cependant il est possible de changer de test de primalité en passant ce test en argument.
+            Exemple d'utilisation de Random_search avec notre propre test de Miller-Rabin :
+                      - sage: RS(1000,MillerRabin)
 
 La fonction GenerationAverageTime(n,k,algo) prend en entrée deux entiers et un des 4 algorithmes cités plus haut.    
 
@@ -30,10 +34,11 @@ La fonction GenerationAverageTime(n,k,algo) prend en entrée deux entiers et un 
                               
                        - Même procédé pour des premiers de 1024 bits avec l'algorithe de Maurer :
                               - sage: GenerationAverageTime(1000,2048,maurer)
-                      
+            
+            On peut alors comparer le temps de génération de chacun des algorithme
                       
 
-
+             
 
            
 Fichiers "tools.py" : 
