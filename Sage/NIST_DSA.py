@@ -1,7 +1,7 @@
 from primality_tests import*
 from tools import*
     
-def nist_dsa(l):
+def dsa_nist(l):
     q=Integer(8)
     L=512+64*l
     n,b = LongDivision(L-1,160)
