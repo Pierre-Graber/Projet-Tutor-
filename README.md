@@ -17,7 +17,7 @@ Une fois le fichier loadALL.py chargé :
                       2) Gordon :
                                - sage: gordon(1024)
                       3) DSA par Nist :
-                               - sage: nist(8)
+                               - sage: dsa_nist(8)
                       4) Maurer :
                                - maurer(1024)
                                
