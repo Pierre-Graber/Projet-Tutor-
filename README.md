@@ -32,10 +32,10 @@ La fonction GenerationAverageTime(n,k,algo) prend en entrée deux entiers et un 
                       - Si on veut tester le temps moyen (sur n=1000 essais ici) pour la génération d'un premier de k=2048 bits avec l'algorithme de Gordon : 
                               - sage: GenerationAverageTime(1000,2048,gordon)
                               
-                       - Même procédé pour des premiers de 1024 bits avec l'algorithe de Maurer :
+                       - Même procédé pour des premiers de 1024 bits avec l'algorithme de Maurer :
                               - sage: GenerationAverageTime(1000,2048,maurer)
             
-            On peut alors comparer le temps de génération de chacun des algorithme
+            On peut alors comparer le temps de génération de chacun des algorithmes.
                       
 
              
