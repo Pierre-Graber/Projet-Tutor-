@@ -1,14 +1,5 @@
 from primality_tests import*
-
-
-#-----------------------------------------------------------------------
-def bin_to_dec(L):
-    ret = 0
-    for i in range (0,len(L)):
-        if L[i] == 1 :
-            ret+= 2**i
-    return ret
-#-----------------------------------------------------------------------   
+from tools import*
     
 def nist(l):
     q=Integer(8)
