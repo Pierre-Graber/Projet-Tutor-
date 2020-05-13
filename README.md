@@ -1,7 +1,7 @@
 # Projet-Tutoré-
 
 L'ensemble du projet est découpé en plusieurs fichiers dans le dossier "Sage".
-Dans le dossier Sage se trouvent tous les algorithmes présentés dans le rapport de ce Projet Tutoré.
+Dans ce dossier se trouvent les algorithmes présentés dans le rapport du Projet Tutoré.
 
 Afin d'utiliser les algorithmes : 
 Depuis un terminal, se placer dans le bon dossier, puis après avoir lancé Sage, importer tout le contenu du projet grâce à la commande : 
