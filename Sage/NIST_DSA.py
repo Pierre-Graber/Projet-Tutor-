@@ -1,16 +1,7 @@
 from primality_tests import*
-
-
-#-----------------------------------------------------------------------
-def bin_to_dec(L):
-    ret = 0
-    for i in range (0,len(L)):
-        if L[i] == 1 :
-            ret+= 2**i
-    return ret
-#-----------------------------------------------------------------------   
+from tools import*
     
-def nist(l):
+def dsa_nist(l):
     q=Integer(8)
     L=512+64*l
     n,b = LongDivision(L-1,160)
