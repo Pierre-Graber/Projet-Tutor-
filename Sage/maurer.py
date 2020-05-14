@@ -1,3 +1,4 @@
+# coding: utf-8
 from primality_tests import*
 from tools import*
 
