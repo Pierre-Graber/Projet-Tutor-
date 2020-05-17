@@ -9,11 +9,9 @@
 \usepackage{algpseudocode}
 \usepackage[options ]{algorithm2e}
 \usepackage{graphicx}
-With
+\usepackage{hyperref}
 
-\usepackage{algorithm}  
-\usepackage{algpseudocode}
-My humble contribution to the French translation (thanks @David-Carlisle):
+
 
 \renewcommand{\listalgorithmname}{Liste des algorithmes}
 \floatname{algorithm}{Algorithme}
@@ -43,7 +41,7 @@ My humble contribution to the French translation (thanks @David-Carlisle):
 }
 
 
-\author{Pierre GRABER, Elias DEBEYSSAC, Toky RANDRIAMALALA}
+\author{Pierre GRABER, Elias DEBEYSSAC}
 
 
 \begin{document}
@@ -67,33 +65,44 @@ La sécurité de ces systèmes de chiffrement repose par exemple sur la difficul
 
 \section{L'aléatoire, les tests de primalité}
 \subsection{Informatique et aléatoire}
-Tous nos algorithmes utilisent la libraire $random$ de python afin de générer des nombres aléatoires. Il parait donc judicieux de se pencher sur la façon dont les langages de programmation tels que python produisent ces nombres et sur le caractère vraiment aléatoire de ces nombres.
-En effet si nos algorithmes ont pour but de pouvoir être utilisés à des fins cryptographiques, il est important qu'ils soient surs, et pour cela il faut que les nombres tirés aléatoirement ne suivent aucune régularité et ne puissent pas être devinés par un attaquant quelconque.
-Si python utilisait un algorithme spécial pour calculer ces nombres alors les systèmes que nous tentons de mettre en place n'auraient aucune valeur car un attaquant aurait potentiellement des informations quant à la façon dont nous construisons nos nombres premiers aléatoires. \newline
+Dans un premier temps nos algorithmes utilisaient la libraire $random$ de python afin de générer des nombres aléatoires, il paraissait donc judicieux de se pencher sur la façon dont cette bibliotheque produit des nombres et sur le caractère vraiment aléatoire de leur distribution.
+En effet si nos algorithmes ont pour but de pouvoir être utilisés à des fins cryptographiques, il est important qu'ils soient surs, et pour cela il faut que les nombres tirés ne suivent aucune régularité et ne puissent pas être devinés ou prédits par un attaquant quelconque. 
+\newline 
+La librairie random de Python est basée sur un générateur nommée Mersenne Twister, qui utilise le nombre premier de Mersenne $2^{19937} - 1$. Ce générateur pseudo-aléatoire présente de nombreux avantages tels que sa vitesse de génération et son comportement aléatoire lorsqu'il est utilisé sur des nombres de tailles raisonnables. Ce module est donc largement utilisé en probabilités et statistiques afin de simuler le comportement de variables aléatoires, ou en modélisation. Cependant son utilisation est largement déconseillée à des fins cryptographiques car fortement inappropriée. En effet si un attaquant arrive à recevoir un échantillon suffisamment grand de nombres générés par Mersenne Twister il a alors une chance de prédire les futures générations. Ce qui représente une violation des propriétés que doivent suivre les générateurs aléatoires sécurisés utilisés en cryptographie. Un simple programme Python disponible via le lien suivant sur github montre à quel point l'utilisation de ce générateur est dangereuse à des fins cryptographiques : \newline
+ 
+\smallbreak - \url{ https://github.com/kmyk/mersenne-twister-predictor}
+\smallbreak
 
----- voir  Yarrow \newline
----- voir  Fortuna \newline
+
+L'exemple suivant montre comment en  fournissant 624 nombres codés sur 32 bits, générés avec la librairie $random$ (donc avec un générateur dit "Mersenne Twister") on arrive à prédire les tirages suivants. 
 
 
----- voir la méthode des carrés médians
+ 
+\hfill\hbox to 0pt{\hss\includegraphics{predict.png}\hss}\hfill\null
+\medbreak
 
----- voir source : \newline
+Même s'il ne s'agit ici que d'une prédiction sur des petits nombres aléatoires de taille 32 bits, l'exemple si dessus montre la dangerosité d'utiliser un tel générateur aléatoire à des fins de sécurité. Heuresement, python fournit d'autres bibliothèques permettant de générer de l'aléa. Notamment le module $secrets$ qui est un Générateur de nombres pseudo-aléatoires Cryptographiquement Sécurisé. Ce module bien qu'un peu plus lent pour la génération que le module $random$, offre des garanties de sécurité que ne peut atteindre ce dernier.  
+D'après la documentation python, $secrets$ est un module permettant de générer des nombres aléatoires forts au sens cryptographique, adaptés à la gestion des secrets tels l'authentification des comptes ainsi que la gestion des mots de passe et des jetons de sécurité.
+Le principe de cette librairie repose sur l'aléa généré par le système d'exploitation de la machine sur laquelle on travaille, plus particulièrement sur la fonction $os.urandom$ qui renvoie une suite d'octet via une source d'aléa spécifique à chacun des ces OS. Toujours d'après la documentation Python, les sorties de cette fonction sont imprédictibles contrairement à celles des fonctions du module $random$, donc plus adaptées pour la crypto. 
+Cependant la bibliothèque $secrets$ n'est pas disponible avec le logiciel SageMath lorsque ce dernier utilise Python 2, le module n'est accessible qu'à partir de la version 9 de SageMath qui utilise Python 3.
+Nous avons donc implémenté notre propre générateur d'aléa, en nous inspirant de la fonction randbelow, et donc en utilisant la classe SystemRandom qui elle même appelle la fonction os.urandom() afin de construire des nombres aléatoires surs.
+ \newline
+ 
 
-https://openclassrooms.com/fr/courses/1389636-a-la-decouverte-de-laleatoire-et-des-probabilites/1389794-fabriquez-votre-propre-fonction-rand
-\newline
-
-----Python $rand$ == Pseudo-aléatoire
 
 
 
 \subsection{Les tests de Primalité}
 
-\subsubsection{Les divisions successives}
+\subsubsection{Les tests implémentés :}
+\paragraph{Les divisions successives} 
+\newline
+
 Lors de la génération d'un nombre aléatoire $n$, afin de savoir si celui ci est un nombre premier il parait raisonnable d'essayer de trouver des candidats pour sa factorisation par divisions successives avant d'effectuer un "réel" test de primalité. En effet comme tout nombre peut se décomposer en facteurs de nombres premiers, il suffit d'effectuer les divisions euclidiennes de ce $n$ par une liste de premiers inférieurs à sa racine carrée afin de savoir si celui est composé ou non. Si après avoir testé tous les nombres premiers  $ p \leq \sqrt{n}$, on ne trouve pas de $p$ tel que : $$n=0\pmod{p}$$ alors on peut conclure que n est premier. Cependant sur des nombres à plusieurs centaines de chiffres, codés par exemples sur 1024 bits, cet algorithme ne peut s'avérer efficace car il demanderait environ $ 2^{512} $ divisions ce qui est évidemment beaucoup trop couteux en temps pour être efficace. 
-Pour tester si un nombre codé sur 1024 bits (environ 300 chiffres décimaux) est premier on peut néanmoins utiliser ces divisions successives jusqu'à un certains rang que l'on appellera $B$ déterminé de manière expérimentale, avant de passer à un test de primalité comme celui expliquer dans le paragraphe suivant. 
+Pour tester si un nombre codé sur 1024 bits (environ 300 chiffres décimaux) est premier on peut néanmoins utiliser ces divisions successives jusqu'à un certains rang que l'on appellera $B$ déterminé de manière expérimentale, avant de passer à un test de primalité comme celui expliqué dans le paragraphe suivant. 
 Le premier objectif de ce projet tutoré a donc été de fixer expérimentalement ce rang $B$ afin de savoir combien de divisions successives il est intéressant d'effectuer avant d'effectuer le test de Miller-Rabin.
 
-\subsubsection{Le Test de Miller-Rabin}
+\paragraph{Le Test de Miller-Rabin} \newline
 
 
 On ne connait pas de formule donnant la totalité des nombres premiers ou permettant de calculer le "n-ième" terme de la suite des nombres premiers. Une première idée est donc d'utiliser des tests de primalité afin de déterminer si un nombre généré aléatoirement est premier ou non. La répartition des nombres premiers nous assure qu'en effectuant de manière répétitive un tel algorithme nous finirons par tomber sur un candidat probablement premier. \newline
@@ -108,23 +117,29 @@ principaux. \newline
 \item Enfin le dernier théorème nous permet d'affirmer que pour $N > 9$ un nombre composé impair composé avec $N-1 = 2^{s}t$, où t impair. Alors $Card~a \in \left\{(\mathbb{Z}/N\mathbb{Z})^*, a^t \equiv 1 \pmod N~ou~ a^{2^{i}t} \equiv -1 \pmod N~pour~un~0<=i<=s-1\right\} <= \frac{phi(N)}{4}$. En itérant donc k fois l'algorithme de Miller-Rabin, on obtient donc une probabilité $<= 1/4^k$ qu'un nombre composé soit déclaré probablement premier ce qui devient négligeable avec quelques dizaines d'itérations.\newline
 \end{itemize} 
 
-Cependant il existe d'autres tests de primalité permettant de fournir une preuve de leur résultat tels que AKS, APRCL (corps cyclotomiques) ou ECPP (courbes elliptiques) contrairement à l'algorithme de Miller-Rabin. Cependant ces algorithmes sont bien plus lents et principalment utilisé à des fins théoriques. \newline
+Cependant il existe d'autres tests de primalité permettant de fournir une preuve de leur résultat tels que AKS, APRCL (corps cyclotomiques) ou ECPP (courbes elliptiques) contrairement à l'algorithme de Miller-Rabin. Cependant ces algorithmes sont bien plus lents et principalement utilisés à des fins théoriques. \newline
 
 Dans le cadre ce projet tutoré nous utiliserons donc le test de primalité de Miller-Rabin pour nos algorithmes. Nous comparerons l'efficacité de nos résultats (en temps) avec le test utilisé par Sage lors de l'appel à la fonction "is pseudoprime", i.e le test de Baillie-PSW, qui est une combinaison de test de Miller-rabin et de Lucas.
+
+\subsubsection{Les tests fournis par Sage }
+La biblitheque d'arithmétique de Sage fournit deux types de test de primalité. Le premier test s'utilise via la méthode $is$\_$prime()$, il permet de prouver la primalité d'un entier $n$, 
 
 
 \section{Algorithmes de Génération de grands nombres premiers}
 
 \subsection{Génération "naïve"}
 
----> pas aléatoire 
-
 Le premier algorithme de génération dit "naif" est simple, il consiste en deux étapes :
+\newline
+\medbreak
     - Tirer un nombre $n$ aléatoirement jusqu'à tomber sur un impair
-    - Tester si cet impair est premier ou non
+\smallbreak
+\newline
+    - Tester si cet impair est premier ou non\newline
         Si ce nombre "n" est composé on incrémente de 2 jusqu'à tomber sur un premier.
-    
-Cette méthode présente un inconvénient majeur, en effet cette génération ne peut pas être considérée comme aléatoire. 
+\newline
+Cette méthode présente un inconvénient majeur, en effet comme nous le montrerons dans la partie 3 de ce rapport, cette génération ne peut pas être considérée comme aléatoire. 
+De plus le nombre de tests de primalité que l'on doit effectuer augmente exponentiellement par rapport à la taille des nombres que l'on veut générer. 
 
 \subsection{Algorithme de recherche aléatoire }
 On sait qu'il existe un nombre infini de nombres premiers (Euclide l'a démontré),  et même si leur répartition est très irréguliere et qu'ils se rarifient dès qu'ils grandissent, on sait que leur répartition vérifie plus ou moins la distribution suivante :
@@ -154,8 +169,6 @@ $p$ est un "strong prime" si il existe des entiers $r$,$s$,$t$ tels que :
 \end{itemize}
 \newline
 \medbreak
-
-    La génération de tels nombres premiers nécessite donc un peu plus de temps que l'algorithme précedent mais elle fournit des nombres premiers qui sont "protégés" des algorithmes de factorisation de $p-1$ et $p+1$.
     
     
 
@@ -182,7 +195,12 @@ $p$ est un "strong prime" si il existe des entiers $r$,$s$,$t$ tels que :
  \caption{Algorithme de Gordon pour la génération de premiers forts}
 \end{algorithm}
 
-Nous verrons dans la partie 3 de ce rapport en quoi et comment l'algorithme de gordon protège de certaines attaques de factorisation.
+
+    La génération de tels nombres premiers nécessite donc un peu plus de temps que l'algorithme précedent mais elle fournit des nombres premiers qui sont mieux "protégés" des algorithmes de factorisation de $p-1$ et $p+1$.
+    En effet l'intêret de l'algorithme de Gordon repose sur les propriétés de $p-1$ et $p+1$. \newline
+    Pour un attaque de Pollard par exemple, la raison pour laquelle $p-1$ est spécial est que $p-1$ est l'ordre du groupe multiplicatif $(Z/nZ)*$. Si on cherche par exemple à factoriser un module RSA $n = p*q $ , on choisit un nombre aléatoire $a \in Z/nZ$, on calcule ensuite $d = pgcd(a,n)$ et si $d > 1$ alors on renvoie $d$.  Sinon, si on a supposé que $p$ était B-friable alors on trouve un entier $m$ diviseur de $p-1$, et on peut alors calculer $x = a^{mn} mod $ $n $, si $d = pgcd(x-1,n) > 1$ alors $d$ est un diviseur non-trivial de $n$.
+
+
 
 \subsection{Méthode proposée par le NIST :  génération de premiers pour DSA}
 Le NIST est l'Institut national des normes et de la technologie américain. Cet institut a proposé un algorithme en 1991 basé sur l'exponentiation modulaire et le problème du logarithme discret permettant de fournir une signature numérique, outil essentiel pour garantir l'intégrité d'un document  ainsi que l'authentification de son auteur.\newline
@@ -208,7 +226,7 @@ Soient $L$ et $N$ des longueurs, avec $N$ divisible par 64.
 
 \subsection{Premiers prouvables : Algorithme de Maurer}
 
-Le prochain algorithme est spécial dans le sens ou il est le seul de notre liste d'algorithmes capable de fournir des nombres premiers surs, prouvables. Son temps d'execution est légérement plus élevé que le temps d'exécution d'un algorithme générant des pseudo-premiers, mais il est néanmoins plutôt efficace pour les tailles dont nous avons besoin. Cet algorithme est un raffinement du théorème de Pocklingon.
+Le prochain algorithme est spécial dans le sens ou il est le seul de notre liste d'algorithmes capable de fournir des nombres premiers surs, prouvables. Son temps d'execution est légérement plus élevé que le temps d'exécution d'un algorithme générant des pseudo-premiers, mais il est néanmoins plutôt efficace pour les tailles dont nous avons besoin. Cet algorithme repose sur un théorème qui est un raffinement du théorème de Pocklington.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -230,7 +248,7 @@ Nom de l'algorithme pour l'appel récursif : \newline
  \hspace*{20mm} - Initialiser :  $r = 0.5$
  
  5 - Calculer : $q = PremierProuvable(k)$ \newline
- 6 - Initialiser : I = \lfloor 2^{n-1} / 2q \rfloor/ \newline 
+ 6 - Initialiser : I = \lfloor 2^{n-1} / 2q \rfloor \newline 
  
  7 - Initialiser : success = 0 \newline
  8 - \algorithmicwhile { success = 0}{ \newline
@@ -260,18 +278,78 @@ La première étape de nos tests expérimentaux a été la détermination du par
 Afin de définir ce paramètre nous avons pré-calculé une liste de premiers inférieurs ou égaux à $2^{32}$. Ensuite nous utilisons notre générateur afin de connaitre le temps moyen pour générer 1000 chiffres premiers avec l'algorithme de notre choix. Le parametre B est alors la valeur jusqu'à laquelle nous allons effectuer les divisions euclidiennes.
 Plus précisemment nos algorithmes de divisions successives effectue les divisions jusqu'à la racine de B. 
 
+\subsection{Temps Moyen de génération} 
+Les tableaux ci dessous donnent un aperçu du cout en temps de chacun des algorithmes cités précedemment.
+
+\subsubsection{ Avec un test de Miller-Rabin } 
+
+\begin{center}
+\emph{Temps moyen en secondes sur 1000 générations avec Miller-Rabin}
+ \begin{tabular}{||c | c | c | c ||} 
+ \hline
+ \textbf{} & \textbf{Random-Search} & \textbf{Gordon} & \textbf{Maurer} \\ [0.5ex] 
+ \hline\hline
+ \emph{256 bits} & 0.00648 & 0.03017  & 0.016218 \\ 
+ \hline
+ \emph{512 bits} & 0.024274 & 0.16410  & 0.052886 \\
+ \hline
+ \emph{1024 bits}  & 0.13308 & 1.23318 & 0.204052 \\
+ \hline
+ \emph{2048 bits} & 0.41064 &  10.48507  & 1.55760 \\
+ \hline
+\end{tabular}
+\end{center}
+
+\subsubsection{ Avec le test de pseudo-primalité de Sage} 
+
+\begin{center}
+\emph{Temps moyen en secondes sur 1000 générations}
+ \begin{tabular}{||c | c | c | c ||} 
+ \hline
+ \textbf{} & \textbf{Random-Search} & \textbf{Gordon} & \textbf{Maurer} \\ [0.5ex] 
+ \hline\hline
+ \emph{256 bits} & 0.00328 & 0.00211  & 0.016218 \\ 
+ \hline
+ \emph{512 bits} & 0.00642 & 0.00825  & 0.052886 \\
+ \hline
+ \emph{1024 bits}  & 0.07620 & 0.08341 & 0.204052 \\
+ \hline
+ \emph{2048 bits} & 0.41064 &  1.079873 & 1.55760 \\
+ \hline
+\end{tabular}
+\end{center}
+
 
 \subsection{Factorisation }
+
+\paragraph{ Avec la fonction factor() de Sage : } \newline \medbreak
 Danc cette partie nous comparons les temps de factorisation de modules RSA (de tailles raisonnables) générés avec deux de nos algorithmes : random-search et gordon. Cette partie tente donc de montrer l'utilité de l'algorithme de gordon qui permet de générer des premiers "forts", présentant donc des avantages quant à la sécurité du module.
-Sage fournit une fonction permettant de factoriser un entier si sa taille est raisonnable (exemple : la fonction prend quelques secondes (1/10s) pour des entiers codés sur 70/80bits). 
+Sage fournit une fonction permettant de factoriser un entier si sa taille est raisonnable (exemple : la fonction prend quelques secondes (1 à 10s) pour des entiers codés sur 70/80bits). 
 \par Nous avons donc ecrit une fonction permettant de calculer le temps de factorisation d'un module RSA, donc d'un entier $n$ tel que : \
 \ $n = p * q$ 
 \newline avec $p$ et $q$ deux premiers générés soit par l'algorithme random-search, soit par celui de gordon.
 
-Les temps de factorisation pour des modules de petites tailles ($ < 70 bits$) sont sensiblement identiques.
+Comme en atteste la courbe ci dessous les temps de factorisation pour des modules de petites tailles (avec p et q $ < 70 bits$) sont sensiblement identiques. Par contre dès lors que l'on génère des modules avec $p$ et $q$  $>$ $2^{80}$ on observe une différence non négligeable entre les temps de factorisation des différents modules. Il semble en effet que les modules construits avec gordon soit plus lents à factoriser que les modules faits avec random-search. Cet écart peut s'expliquer par la méthode de factorisation utilisée par Sage lors de l'appel à la fonction $factor()$. D'après la documentation, cette fonction implémente une combinaison de plusieurs méthodes de factorisation, telles que la méthode Rho de Pollard, la méthode des formes quadratiques de Shanks, celle des courbes ellitiques de Lenstra ainsi qu'une recherche des puissances pures, elle renvoie ensuite des facteurs qui ont passé le test de pseudo-primalité de BPSW $is-pseudoprime$ cité plus haut. La méthode des courbes elliptiques ainsi que la méthode rho de Pollard sont très efficaces si soit $p$ soit $q$ sont de petites tailles, générer un module RSA avec $p$ et $q$ assez grands garantit donc la sécurité du module via une attaque par une de ces factorisations, le fait que (p-1) et (p+1) aient des facteurs premiers n'intervient donc pas ici. La vérification de la primalité du facteur trouvé peut etre un élément de réponse quant à la question du temps de factorisation des modules 'gordon'. En effet pour que le facteur trouvé noté $p$ passe le test de BPSW, et notamment le test de Lucas, il faut trouver un entier $a$ tel que : \newline \smallbreak
+$a^{p-1} $ $\equiv$ $ 1$ mod $p $ \newline
+et prouver que pour tout diviseur premier $q$ de $p-1$ on ait :  \newline \smallbreak
+$ a^{(p-1)/q} $ $\ne$ $1$ mod $p$ \newline
+De telles vérifications semblent donc plus couteuses lorsque $p-1$ n'a pas de petits facteurs premiers, ce qui expliquerait la perte de temps constatée.
+
+
 
 \hfill\hbox to 0pt{\hss\includegraphics{factr.png}\hss}\hfill\null
 
+
+\paragraph{ Avec la fonction qsieve : } \newline
+Sage permet en plus de sa fonction $factor()$, l'utilisation de la méthode de factorisation du crible quadratique grâce à sa fonction $qsieve()$. Cette méthode du crible quadratique est reconnue comme étant la méthode la plus rapide pour factoriser $n=p*q$ lorsque $p$ et $q$ sont de tailles semblables, après le crible sur corps de nombres. L'algorithme du crible quadratique est un raffinement de la l'algorithme de factorisation de Dixon, lui même étant basé sur l'algorithme de Fermat.\newline
+Pour tester la factorisation d'un entier $n$, les tests de Fermat et de Dixon cherchent des entiers $x$ et $y$ tels que : 
+\smallbreak $x^{2}$ $\equiv$ $ y ^{2} $ mod $n$ et $x$ $\ne $ $ y $ mod $n$  \newline on aurait alors :
+\smallbreak $x^{2} - y ^{2} $ $\equiv$ $0$ mod $n$, \newline  donc :
+\smallbreak $(x-y)(x+y)$  $\equiv$ $0$ mod $n$.
+\newline Et donc $n$ aurait comme facteurs non triviaux $f1$ = $pgcd(n,x+y)$ et $f2$ = $pgcd(n,x-y)$.
+
+\paragraph{ Conclusion sur l'utilité des premiers forts de Gordon : }
+Même si à première vue il semble  que la méthode factor de Sage soit plus performante sur des modules générés avec un simple générateur aléatoire qu'avec l'algorithme de Gordon (avec $p$ et $q$ de tailles avoisinant les 100bits), il est impossible d'affirmer que ces premiers "forts" soient réellement utiles à des fins de sécurité contre les attaques par factorisation. Certains algorithmes tels que le crible sur corps de nombres, ou même le crible quadratique permettent de factoriser avec la même efficacité les deux types de modules cités précedemment. Pour garantir la sécurité du système RSA, il semblerait donc que rien ne soit plus efficace que de choisir $p$ et $q$ suffisamment grands afin de rendre le nombre de calculs beaucoup trop grand par rapport à ce que peuvent réaliser les ordinateurs utilisés de nos jours.
 
 
 
