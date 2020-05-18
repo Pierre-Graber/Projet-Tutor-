@@ -22,8 +22,8 @@ def gordon(test=is_pseudoprime):
 
 
 def gT(n,test=is_pseudoprime):
-    s=random_search(n//3)
-    t=random_search(n//3)
+    s=RS(n//3)
+    t=RS(n//3)
     iz = randint(0,2**(n//5))
     i=iz
     while not test(2*i*t+1):
