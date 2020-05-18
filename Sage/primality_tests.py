@@ -47,7 +47,7 @@ def MillerRabin(n):
     """ entrées : un entier impair n et un paramêtre de sécurité t supérieur ou égal à 1 """
     p=n-1
     s=0
-    t=3
+    t=20
     while(p%2==0):
         s=s+1
         p=p//2
