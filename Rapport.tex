@@ -98,6 +98,8 @@ Nous avons donc implémenté notre propre générateur d'aléa, en nous inspiran
 \paragraph{Les divisions successives} 
 \newline
 
+
+
 Lors de la génération d'un nombre aléatoire $n$, afin de savoir si celui ci est un nombre premier il parait raisonnable d'essayer de trouver des candidats pour sa factorisation par divisions successives avant d'effectuer un "réel" test de primalité. En effet comme tout nombre peut se décomposer en facteurs de nombres premiers, il suffit d'effectuer les divisions euclidiennes de ce $n$ par une liste de premiers inférieurs à sa racine carrée afin de savoir si celui est composé ou non. Si après avoir testé tous les nombres premiers  $ p \leq \sqrt{n}$, on ne trouve pas de $p$ tel que : $$n=0\pmod{p}$$ alors on peut conclure que n est premier. Cependant sur des nombres à plusieurs centaines de chiffres, codés par exemples sur 1024 bits, cet algorithme ne peut s'avérer efficace car il demanderait environ $ 2^{512} $ divisions ce qui est évidemment beaucoup trop couteux en temps pour être efficace. 
 Pour tester si un nombre codé sur 1024 bits (environ 300 chiffres décimaux) est premier on peut néanmoins utiliser ces divisions successives jusqu'à un certains rang que l'on appellera $B$ déterminé de manière expérimentale, avant de passer à un test de primalité comme celui expliqué dans le paragraphe suivant. 
 Le premier objectif de ce projet tutoré a donc été de fixer expérimentalement ce rang $B$ afin de savoir combien de divisions successives il est intéressant d'effectuer avant d'effectuer le test de Miller-Rabin.
@@ -223,6 +225,44 @@ Soient $L$ et $N$ des longueurs, avec $N$ divisible par 64.
 \item $(p-1)$ doit être divisible par q.
 \end{itemize}
 
+\begin{algorithm}[H]
+\SetAlgoLined
+\newline
+\newline
+\algorithmicrequire{ Un entier $l$, 0 $\le$ $l$ $\le$ 8}\newline
+\algorithmicensure{ Un premier $q$ de 160-bits, et un premier $p$ de longueur L où $L = 512 + 64l$}\newline
+
+ 1 - Calculer L = 512 + 64$l$ en utilisant les divisions longues de $(L-1)$ par 160, trouver $n,b$ tels que $L-1 = 160n + b$\newline
+
+ 2 - \algorithmicwhile{ $q$ n'est pas premier } \newline
+ \hspace*{10mm} - Tirer une graine aléatoire $s$ de longueur $g$> $160$ \newline
+ \hspace*{10mm} - Calculer $U = H(s) $\oplus$ H((s+1)$ mod $2^{g})$      \newline
+ \hspace*{10mm} - Former $q$ à partir de $U$, en initialisant à 1 le bit le plus fort ainsi 
+ \newline \hspace*{10mm} que le bit le moins fort.  \newline
+ \hspace*{10mm} - Tester la primalité de $q$
+
+ 
+ 3 - Initialiser : $i=0, j=2$ \newline
+ 4 - \algorithmicwhile{ $i$ $<$ 4096 :}
+ \newline \hspace*{10mm}
+    - \algorithmicfor { $k$ allant de $0$ à $n$} :
+\newline \hspace*{20mm} -- $V_{k}$ = $H((s+j+k)$ mod 
+$2^{g})$
+\newline \hspace*{20mm} -- $W$ = $V_{0}$ + $V_{1}^{160}$ + $V_{2}^{320}$ $+ ... +$  $V_{n-1}^{160(n-1)}$ + $(V_{n}$ mod $2^{b}$)$2^{160n}$
+
+\newline \hspace*{10mm} - Calculer $c = X $ mod $2q$ et initialiser p à : $p = X- (c-1)$
+
+\newline \hspace*{10mm} - \algorithmicif { $p$ $\geq$ 
+$2^{L-1}$ :} 
+\newline \hspace*{20mm} -- \algorithmicif { $p$ est premier :}
+\newline \hspace*{30mm}  \algorithmicreturn{ ($p,q$) }
+
+ 5 - Retourner à l'étape 2.
+ \newline
+ 
+ \caption{Algorithme proposé par le NIST pour la génération de clés DSA}
+\end{algorithm}
+
 
 \subsection{Premiers prouvables : Algorithme de Maurer}
 
@@ -275,8 +315,15 @@ Dans cette partie nous expliciterons les résultats obtenus avec nos algorithmes
 \subsection{Détermination du nombre de Division successives}
 La première étape de nos tests expérimentaux a été la détermination du paramètre appelé "B" dans le "Handbook of applied cryptography". Ce paramètre définit le nombre de divisions successives qu'il est judicieux d'effectuer avant de passer à un test de primalité du type Miller-Rabin. Cette étape permet d'éliminer un certain nombre de candidats de manière plus rapide qu'un "réel" test de primalité et donc de gagner du temps sur la génération d'un premier. 
 \newline
-Afin de définir ce paramètre nous avons pré-calculé une liste de premiers inférieurs ou égaux à $2^{32}$. Ensuite nous utilisons notre générateur afin de connaitre le temps moyen pour générer 1000 chiffres premiers avec l'algorithme de notre choix. Le parametre B est alors la valeur jusqu'à laquelle nous allons effectuer les divisions euclidiennes.
-Plus précisemment nos algorithmes de divisions successives effectue les divisions jusqu'à la racine de B. 
+Afin de définir ce paramètre nous avons pré-calculé une liste de premiers inférieurs à $2^{32}$. Ensuite nous utilisons notre  générateur (la fonction $GenerationAverageTime$ du fichier $generateur.py$) afin de connaître le temps moyen pour générer 1000 chiffres premiers avec l'algorithme de notre choix en  faisant varier le paramètre $B$. Nous traçons les résultats et obtenons la courbe suivante : 
+
+
+{\centering
+\includegraphics[totalheight=0.3\textheight]{DS.png}
+}
+Après de nombreux tests, on trouve qu'effectuer environ $2^{12}$ soit 4096 divisions successives permet d'optimiser le temps de retour des tests de primalité, et donc d'optimiser les temps de génération de premiers.
+Ces expérimentations nous amènent donc à prendre comme valeur $2^{12}$ pour $B$ . Ce parametre est donc initialisé par défaut à $2^{12}$ sur les fonctions qui nécessitent d'utiliser l'algorithme des divisions successives (les paramêtres des fonctions par défaut sont faits pour générer des nombres de 1024bits).
+
 
 \subsection{Temps Moyen de génération} 
 Les tableaux ci dessous donnent un aperçu du cout en temps de chacun des algorithmes cités précedemment.
@@ -289,13 +336,13 @@ Les tableaux ci dessous donnent un aperçu du cout en temps de chacun des algori
  \hline
  \textbf{} & \textbf{Random-Search} & \textbf{Gordon} & \textbf{Maurer} \\ [0.5ex] 
  \hline\hline
- \emph{256 bits} & 0.00648 & 0.03017  & 0.016218 \\ 
+ \emph{256 bits} & 0.00448 & 0.003017  & 0.02229 \\ 
  \hline
- \emph{512 bits} & 0.024274 & 0.16410  & 0.052886 \\
+ \emph{512 bits} & 0.013274 & 0.016414  & 0.08730 \\
  \hline
- \emph{1024 bits}  & 0.13308 & 1.23318 & 0.204052 \\
+ \emph{1024 bits}  & 0.13308 & 0.13318 & 0.411052 \\
  \hline
- \emph{2048 bits} & 0.41064 &  10.48507  & 1.55760 \\
+ \emph{2048 bits} & 0.694861 &  1.50748  & 2.38364 \\
  \hline
 \end{tabular}
 \end{center}
@@ -310,15 +357,21 @@ Les tableaux ci dessous donnent un aperçu du cout en temps de chacun des algori
  \hline\hline
  \emph{256 bits} & 0.00328 & 0.00211  & 0.016218 \\ 
  \hline
- \emph{512 bits} & 0.00642 & 0.00825  & 0.052886 \\
+ \emph{512 bits} & 0.0122 & 0.00825  & 0.052886 \\
  \hline
- \emph{1024 bits}  & 0.07620 & 0.08341 & 0.204052 \\
+ \emph{1024 bits}  & 0.07620 & 0.08341 & 0.254052 \\
  \hline
  \emph{2048 bits} & 0.41064 &  1.079873 & 1.55760 \\
  \hline
 \end{tabular}
 \end{center}
 
+Comme en atteste les tableaux ci contre ainsi que l'exemple de la courbe ci dessous, les temps de génération sont meilleurs avec le test de pseudo-primalité fourni par Sage. ce qui nous permet de dire que le test de Baillie-PSW est très efficace. D'après la documentation, ce test mélange test de Miller-Rabin de niveau 2 et le test de lucas-lehmer, la probabilité que les générateurs retournent un nombre composé en utilisant ce test de pseudo-primalité est très négligeable, toujours d'après la documentation il n'éxiste pas d'exemple de ce type d'entier composé ayant passé le test. 
+
+{\centering 
+\includegraphics[totalheight=0.3\textheight]{IPPRS.png} \newline
+\hspace*{20mm}\emph{Exemple de comparaison des temps de génération avec MillerRabin et is-pseudoprime de Sage}
+}\newline
 
 \subsection{Factorisation }
 
@@ -354,14 +407,37 @@ Même si à première vue il semble  que la méthode factor de Sage soit plus pe
 
 
 \subsection{Distribution aléatoire}
-\section*{Sources}
+Dans cette sous-partie nous comparons les distributions obtenues avec l'utilisation d'un générateur naïf (Algorithme de la partie 2.1) et le générateur random-search. Le but étant de montrer que la distribution du générateur naif n'est pas aléatoire et que certaines valeurs ont plus de chances de sortir que d'autres, impliquant donc une perte de qualité quant à la sécurité des nombres générés. 
+
+\paragraph{Distribution de la Génération naive : }
+De manière intuitive, on se rend bien compte que la génération naïve ne peut être avoir une distribution aléatoire, car l'écart entre deux nombres premiers influe sur la probabilité de générer un de ces premiers. En effet si deux nombres premiers $p1$ et $p2$ sont très proches l'un de l'autre, par exemple si ils sont jumeaux alors on a  $p1=p2+2$ en utilisant l'algorithme naif on a alors que très peu de chances de tomber sur $p2$, la seule possibilité pour que l'algorithme nous retourne $p2$ est que l'on soit tombé sur $p2$ à la première étape de cet algorithme, i.e que la fonction $randombelow$ tombe directement sur $p2$. \newline Si on note l=[$p_{1}$,$p_{2}$, ...., $p_{n}$] la liste ordonnée des premiers jusqu'au $n-ième$ premier $p_{n}$. Alors la différence entre $p_{k}$ et $p_{k-1}$ (avec $k$ $\in$ $N$) influe sur le probabilité de tomber sur $p_{k}$. Pour illustrer cela nous avons généré 100 000 000 de premiers $p$ $< 2^{18} $ tels que $p \in [25 000, 30 000]$ 
+On obtient alors la distribution suivante : 
+
+{\centering 
+\includegraphics[totalheight=0.3\textheight]{distrib-naiveGen.png}
+\hspace*{40mm}\emph{Distribution du générateur naïf}
+}\newline
+\smallbreak
+Le pic que l'on aperçoit représente le premier $31469$ qui a été généré plus de 54 000 fois. Cet exemple illustre bien le caractère non aléatoire d'un tel générateur, car en effet le premier "avant" $31469$ est $31397$, l'écart entre ces deux premiers est l'écart le plus important entre deux premiers de notre échantillon. A titre comparatif, $31513$ a été généré seulement 1592 fois, car il a un premier jumeau ($31511$) qui le précède. Il a donc été atteint environ 36 fois moins souvent que le pic maximum.
+La probabilité d'atteindre un premier avec l'algorithme naïf est donc proportionnelle à l'écart qui existe entre ce premier est celui qui le précède. 
+
+\paragraph{Distribution de la Génération avec Random-Search}
+Cet algorithme est censé être  complêtement aléatoire, étant donné qu'il ne contient qu'une boucle qui génére un entier, qui teste sa primalité et qui s'arrête et renvoie cet entier si le test est positif. Contrairement à la génération naive nous n'avons pas pu générer 10 000 000 de nombres $< 2^{18}$ car c'était beaucoup trop couteux en stockage et en recherche sur les dictionnaires Python que nous utilisons afin de tracer des histogrammes. En effet quand un premier est généré avant de l'ajouter à notre structure de données qui est le dictionnaire, on vérifie si notre élément est présent, donc lorsque des mêmes premiers sont générés les tests sont rapides, et lorsque ces premiers sont tous différents les uns des autres les tests sont beaucoup plus lents. Nous avons donc effectuer le test sur un échantillon de 1 000 000 de premiers. Nous obtenons alors une distribution qui semble aléatoire, dont l'histogrammes entre $[25 000,35 000]$ est le suivant : 
+
+{\centering 
+\includegraphics[totalheight=0.3\textheight]{RS-distrib.png}\newline
+\hspace*{40mm}\emph{Distribution de Random search}
+}\newline
+
+\paragraph{Distribution de la Génération des premiers forts de Gordon}
+
+Alors que sur un million d'essais de génération de premiers de taille 18-bits avec random-search on obtenait une liste de pratiquement 1000 premiers entre $25000$ et $35 000$, avec l'algorithme de gordon la liste obtenue est dix fois moins longue.
+Même si la génération des nombres premiers avec l'algorithme de Gordon semble aléatoire, le peu de nombres que peut retourner cet algorithme semble être une faiblesse. En effet si un attaquant sait que l'algorithme de Gordon est appliqué pour la génération des clés RSA, qu'il a la taille du module, il peut alors dresser une liste de premiers intéressant à tester par leur propriétés de premiers forts. Encore une fois la sécurité est accrue dès lors que les tailles augmentent. S'ils existent 100 premiers forts entre 25 000 et 35 000 on peut se douter qu'il en existe une quantité suffisamment importante entre $2^{2040}$ et ${2
+^{2050}$ (exemple d'intervalle qui correspond à peu près à des tailles de modules RSA avec $p$ et $q$ de $1024-bits$) pour qu'un ordinateur ne puisse les stocker, et donc qu'un attaquant n'exploite cette faiblesse. 
 
 
 
-
- 
-  
-
-
+\section{Conclusion}
+Nous avons pu lors de ce Projet tutoré étudier le comportement des algorithmes de générations de premiers aléatoires fournis par le "Handbook of Applied Cryptography" en fonction des tests de primalité utilisés. Les résultats que nous obtenons avec nos propres tests sont cohérents et  Nous avons axé nos recherches et nos tests expérimentaux autour des modules RSA, afin de faire un lien entre ce Projet et le cours d'Arithmétique et Cryptologie que nous avons suivi ce semestre. Les tests expérimentaux que nous avons pu faire sont évidemment limités par la capacité des ordinateurs que nous utilisons (ordinateurs personnels, de bureau), c'est pourquoi les résultats obtenus ainsi que les conclusions que nous en tirons sont à relativiser. Les conclusions notamment quant aux temps de factorisation de modules RSA sont tirées de tests expérimentaux sur des tailles petites (120 bits pour $p$ et $q$ au maximum)
 
 \end{document}
